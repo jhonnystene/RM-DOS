@@ -22,23 +22,24 @@ bootstrap:
 os_start:
 	; Print welcome message
 	call clearscreen
-	mov si, message_helloworld
+	mov si, bootmessage_helloworld
 	call printstring
-	mov si, message_kernelversion
+	mov si, bootmessage_kernelversion
 	call printstring
 	
 	call shell_start
 	
-	; Enter a shell!
-	jmp hang
+	; We should never get here unless the shell crashed
+	mov ah, 0
+	jmp panic
 	
 ; BOOT MESSAGES
-message_helloworld db "Hello, World!", 13, 10, 0
-message_kernelversion db "Bismuth Kernel Version 0.1a", 13, 10, 0
-message_enteringmode13 db "Entering video mode 13h...", 13, 10, 0
-message_inmode13 db "Successfully entered video mode 13h!", 13, 10, 0
-message_enteringmode3 db "Entering text mode...", 13, 10, 0
-message_inmode3 db "Successfully dropped to text mode!", 13, 10, 0
+bootmessage_helloworld db "Hello, World!", 13, 10, 0
+bootmessage_kernelversion db "Bismuth Kernel Version 0.1a", 13, 10, 0
+bootmessage_enteringmode13 db "Entering video mode 13h...", 13, 10, 0
+bootmessage_inmode13 db "Successfully entered video mode 13h!", 13, 10, 0
+bootmessage_enteringmode3 db "Entering text mode...", 13, 10, 0
+bootmessage_inmode3 db "Successfully dropped to text mode!", 13, 10, 0
 
 ; INCLUDES
 %include "src/kernel/screen.asm"
