@@ -40,6 +40,15 @@ floppy_reset:
 	mov dl, [BootDevice]
 	stc
 	int 13h
+	call floppy_check_error
+	popa
+	ret
+	
+floppy_check_error:
+	pusha
+	mov ah, 01h
+	mov dl, [BootDevice]
+	int 13h
 	popa
 	ret
 	
@@ -63,10 +72,6 @@ floppy_get_location:
 	pop ax
 	pop bx
 	mov dl, [BootDevice]
-	ret
-
-floppy_get_file_list:
-	pusha
 	ret
 
 SectorsPerTrack		dw 18
