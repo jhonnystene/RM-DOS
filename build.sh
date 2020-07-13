@@ -23,4 +23,4 @@ sleep 0.2
 umount tmp-loop || exit
 rm -rf tmp-loop
 
-qemu-system-i386 -fda images/bismuth.flp
+qemu-system-x86_64 -fda images/bismuth.flp

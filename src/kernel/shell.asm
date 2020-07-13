@@ -1,4 +1,5 @@
 ; Super Mega Awesome SHell (SMASH)
+; Wanna SMASH?
 
 shell_start:
 	mov si, prompt
@@ -14,6 +15,7 @@ shell_start:
 		cmp al, 08
 		je .backspace
 		
+		call char_upper
 		mov byte [buffer + bx], al
 		inc bx
 		
@@ -31,6 +33,15 @@ shell_start:
 		call printchar
 		
 		; TODO: Run command
+		mov di, buffer
+		
+		mov si, command_about
+		call stringsequal
+		jc about
+		
+		mov si, command_milestone
+		call stringsequal
+		jc milestone
 		
 		jmp shell_start
 	
@@ -47,6 +58,37 @@ shell_start:
 		mov al, 08
 		call printchar
 		jmp .loop
+		
+about:
+	mov si, about_text_1
+	call printstring
+	mov si, about_text_2
+	call printstring
+	mov si, about_text_3
+	call printstring
+	jmp shell_start
+	
+milestone:
+	mov si, milestone_text_1
+	call printstring
+	mov si, milestone_text_2
+	call printstring
+	mov si, milestone_text_3
+	call printstring
+	mov si, milestone_text_4
+	call printstring
+	jmp shell_start
 
 prompt db "> ", 0
 buffer times 64 db 0
+
+command_about		db "ABOUT", 0
+about_text_1		db "The Real Mode Disk Operating System (RM-DOS) By Johnny Stene", 10, 13, 0
+about_text_2		db "Kernel: Bismuth v0.1a Alpha", 10, 13, 0
+about_text_3		db "Shell: Super Mega Awesome SHell (SMASH) v1", 10, 13, 0
+
+command_milestone	db "MILESTONE", 0
+milestone_text_1	db "Last completed milestone: 1", 10, 13, 0
+milestone_text_2	db "Milestone 1: Interactable shell", 10, 13, 0
+milestone_text_3	db "Milestone 2: Floppy Driver w/ file API", 10, 13, 0
+milestone_text_4	db "Milestone 3: Graphics APIs", 10, 13, 0
