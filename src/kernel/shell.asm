@@ -60,11 +60,13 @@ shell_start:
 		jmp .loop
 		
 about:
+	mov si, kernelmsg_osname
+	call printstring
+	mov si, kernelmsg_copyright
+	call printstring
 	mov si, about_text_1
 	call printstring
 	mov si, about_text_2
-	call printstring
-	mov si, about_text_3
 	call printstring
 	jmp shell_start
 	
@@ -83,9 +85,8 @@ prompt db "> ", 0
 buffer times 64 db 0
 
 command_about		db "ABOUT", 0
-about_text_1		db "The Real Mode Disk Operating System (RM-DOS) By Johnny Stene", 10, 13, 0
-about_text_2		db "Kernel: Bismuth v0.1a Alpha", 10, 13, 0
-about_text_3		db "Shell: Super Mega Awesome SHell (SMASH) v1", 10, 13, 0
+about_text_1		db "Kernel: Bismuth v0.1a Alpha", 10, 13, 0
+about_text_2		db "Shell: Super Mega Awesome SHell (SMASH) v1", 10, 13, 0
 
 command_milestone	db "MILESTONE", 0
 milestone_text_1	db "Last completed milestone: 1", 10, 13, 0

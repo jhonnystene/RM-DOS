@@ -37,9 +37,9 @@ bootstrap:
 os_start:
 	; Print welcome message
 	call clearscreen
-	mov si, bootmessage_helloworld
+	mov si, kernelmsg_osname
 	call printstring
-	mov si, bootmessage_copyright
+	mov si, kernelmsg_copyright
 	call printstring
 	
 	call shell_start
@@ -49,13 +49,8 @@ os_start:
 	jmp panic
 	
 ; BOOT MESSAGES
-bootmessage_helloworld 			db "The Real Mode Disk Operating System (RM-DOS)", 13, 10, 0
-bootmessage_copyright			db "Copyright (c) 2020 Johnny Stene. Some Rights Reserved.", 13, 10, 0
-bootmessage_kernelversion		db "Bismuth Kernel Version 0.1a", 13, 10, 0
-bootmessage_enteringmode13 		db "Entering video mode 13h...", 13, 10, 0
-bootmessage_inmode13 			db "Successfully entered video mode 13h!", 13, 10, 0
-bootmessage_enteringmode3 		db "Entering text mode...", 13, 10, 0
-bootmessage_inmode3 			db "Successfully dropped to text mode!", 13, 10, 0
+kernelmsg_osname	 			db "The Real Mode Disk Operating System (RM-DOS)", 13, 10, 0
+kernelmsg_copyright				db "Copyright (c) 2020 Johnny Stene. Some Rights Reserved.", 13, 10, 0
 
 ; INCLUDES
 %include "src/kernel/floppy.asm"
