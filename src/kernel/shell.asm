@@ -54,6 +54,10 @@ shell_start:
 		call stringsequal
 		jc mode_video
 		
+		mov si, command_panic
+		call stringsequal
+		jc kpanic
+		
 		jmp shell_start
 	
 	.backspace:
@@ -69,7 +73,11 @@ shell_start:
 		mov al, 08
 		call printchar
 		jmp .loop
-		
+
+kpanic:
+	mov ah, 1
+	jmp panic
+
 mode_text:
 	call enter_text_mode
 	jmp shell_start
@@ -141,3 +149,4 @@ command_milestone	db "MILESTONE", 0
 command_floppy_test	db "FLOPPY TEST", 0
 command_mode_video	db "MODE VIDEO", 0
 command_mode_text	db "MODE TEXT", 0
+command_panic		db "PANIC", 0

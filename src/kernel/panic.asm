@@ -30,11 +30,11 @@ panic:
 		call printstring
 		jmp hang
 
-panicmessage_header db "Kernel PANIC!", 0
-panicmessage_halted db "System halted.", 0
+panicmessage_header db "Kernel PANIC!", 13, 10, 0
+panicmessage_halted db "System halted.", 13, 10, 0
 
 ; Code 0
-panicmessage_unknown db "Unknown error!", 0
+panicmessage_unknown db "Unknown error!", 13, 10, 0
 
 ; Code 1
-panicmessage_user db "User requested panic!", 0
+panicmessage_user db "User requested panic!", 13, 10, 0
