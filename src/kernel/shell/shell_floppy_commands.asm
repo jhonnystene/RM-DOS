@@ -1,15 +1,11 @@
-mov si, command_floppy_test
-call string_streq
-jc floppy_test
-
 mov si, command_floppy_dump
 call string_streq
-jc floppy_dump
+jc shell_floppy_dump
 
 mov si, command_floppy_read
 call string_streq
-jc floppy_read
+jc shell_floppy_read
 
 mov si, command_floppy_explore
 call string_streq
-jc floppy_explore
+jc shell_floppy_explore

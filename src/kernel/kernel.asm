@@ -21,6 +21,8 @@ callvectors:
 	jmp screen_newline				; Print a newline + carriage return.
 	jmp screen_print_2hex			; Print an 8-bit value to screen.
 	jmp screen_print_4hex			; Print a 16-bit value to screen.
+	jmp screen_repeatchar			; Print a character repeatedly.
+	jmp screen_dump_floppy_sector	; Dump floppy sector to screen.
 	
 	; Keyboard driver functions
 	jmp keyboard_waitkey 			; Wait for a key to be pressed, and return that key.

@@ -1,7 +1,7 @@
 ; Floppy programs for SMASH
 
 ; Let user explore around the floppy
-floppy_explore:
+shell_floppy_explore:
 	mov cx, 0
 	
 	.loop:
@@ -54,7 +54,7 @@ floppy_explore:
 	.controls_msg	db "A: Move back a sector, D: Move forward a sector, S: Exit", 13, 10, 0
 
 ; Read floppy data into memory
-floppy_read:
+shell_floppy_read:
 	; First, we need to figure out where to start reading from.
 	mov si, .start_point_msg
 	call screen_puts
@@ -80,55 +80,12 @@ floppy_read:
 	.start_point_msg db "Sector to start: ", 0
 	.count_msg db		"Count: ", 0
 	
-
 ; Show a hexdump of first loaded sector
 ; TODO: Let user choose what sector to dump
-floppy_dump:
-	pusha
-	mov bx, 0
-	mov cx, 0
-	.loop:
-		mov al, [Buffer + bx]
-		call screen_print_2hex
-		;mov al, ' '
-		;call screen_putchar
-		inc bx
-		inc cx
-		cmp bx, 512
-		je .done
-		cmp cx, 32
-		je .newline
-		jmp .loop
-	
-	.newline:
-		call screen_newline
-		mov cx, 0
-		jmp .loop
-		
-	.done:
-		call screen_newline
-		popa
-		jmp shell_start
-
-; Try to reset the floppy drive
-floppy_test:
-	call floppy_reset
-	jc .error
-	
-	mov si, .text_good
-	call screen_puts
-	
+shell_floppy_dump:
+	call screen_dump_floppy_sector
 	jmp shell_start
-	
-	.error:
-		mov si, .text_error
-		call screen_puts
-		jmp shell_start
-	
-	.text_good		db "Floppy reset success!", 10, 13, 0
-	.text_error		db "Floppy reset failure!", 10, 13, 0
-	
-command_floppy_test			db "FLOPPY RESET", 0
+
 command_floppy_dump 		db "FLOPPY DUMP", 0
 command_floppy_read 		db "FLOPPY READ", 0
 command_floppy_explore		db "FLOPPY EXPLORE", 0
