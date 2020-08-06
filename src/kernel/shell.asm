@@ -87,7 +87,9 @@ shell_start:
 		jmp .loop
 	
 floppy_read:
-	call floppy_read_sector_0
+	mov ax, 0
+	mov bl, 1
+	call floppy_read_sectors
 	jmp shell_start
 	
 floppy_dump:

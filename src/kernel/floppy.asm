@@ -73,19 +73,21 @@ floppy_get_location:
 	pop bx
 	mov dl, [BootDevice]
 	ret
-	
-floppy_read_sector_0:
+
+; In: AX - Logical Sector Number, BL - Sector Count
+; Out: Buffer - Data
+floppy_read_sectors:
 	call floppy_reset
 	pusha
-	mov ax, 0
 	call floppy_get_location
-	mov ax, 0201h
+	mov ah, 02h
+	mov al, bl
 	mov bx, Buffer
 	int 13h
 	jc .error
 	popa
 	ret
-	
+
 	.error:
 		mov si, floppy_error_msg
 		call printstring
