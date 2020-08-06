@@ -122,9 +122,13 @@ kernel_panic_msg_dx				db "DX: ", 0
 kernel_panic_msg_si				db "SI: ", 0
 kernel_panic_msg_di				db "DI: ", 0
 
-; INCLUDES
-%include "src/kernel/floppy.asm"
-%include "src/kernel/screen.asm"
-%include "src/kernel/shell.asm"
-%include "src/kernel/keyboard.asm"
-%include "src/kernel/string.asm"
+; DRIVERS
+%include "src/kernel/drivers/floppy.asm"
+%include "src/kernel/drivers/screen.asm"
+%include "src/kernel/drivers/keyboard.asm"
+
+; LIBRARIES
+%include "src/kernel/libraries/string.asm"
+
+; OTHER
+%include "src/kernel/shell/shell.asm"

@@ -1,6 +1,7 @@
 ; Super Mega Awesome SHell (SMASH)
 ; Wanna SMASH?
 
+; TODO: Load into somewhere the user wants.
 shell_get_string:
 	mov bx, 0 ; This line was missing and caused me 3 hours of debugging.
 	.loop:
