@@ -58,6 +58,18 @@ shell_start:
 		call stringsequal
 		jc kpanic
 		
+		mov si, command_hex_test
+		call stringsequal
+		jc hextest
+		
+		mov si, command_floppy_dump
+		call stringsequal
+		jc floppy_dump
+		
+		mov si, command_floppy_read
+		call stringsequal
+		jc floppy_read
+		
 		jmp shell_start
 	
 	.backspace:
@@ -73,6 +85,46 @@ shell_start:
 		mov al, 08
 		call printchar
 		jmp .loop
+	
+floppy_read:
+	call floppy_read_sector_0
+	jmp shell_start
+	
+floppy_dump:
+	mov bx, 0
+	mov cx, 0
+	.loop:
+		mov al, [Buffer + bx]
+		call printhex
+		;mov al, ' '
+		;call printchar
+		inc bx
+		inc cx
+		cmp bx, 512
+		je .done
+		cmp cx, 32
+		je .newline
+		jmp .loop
+	
+	.newline:
+		mov al, 10
+		call printchar
+		mov al, 13
+		call printchar
+		mov cx, 0
+		jmp .loop
+		
+	.done:
+		mov al, 10
+		call printchar
+		mov al, 13
+		call printchar
+		jmp shell_start
+	
+hextest:
+	mov al, 0Fh
+	call printhex
+	jmp shell_start
 
 kpanic:
 	mov ah, 1
@@ -146,7 +198,10 @@ buffer times 64 db 0
 
 command_about		db "ABOUT", 0
 command_milestone	db "MILESTONE", 0
-command_floppy_test	db "FLOPPY TEST", 0
+command_floppy_test	db "FLOPPY RESET", 0
+command_floppy_dump db "FLOPPY DUMP", 0
+command_floppy_read db "FLOPPY READ", 0
 command_mode_video	db "MODE VIDEO", 0
 command_mode_text	db "MODE TEXT", 0
+command_hex_test	db "HEX TEST", 0
 command_panic		db "PANIC", 0

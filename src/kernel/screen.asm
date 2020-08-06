@@ -64,3 +64,29 @@ printchar:
 	int 10h
 	popa
 	ret
+	
+; Inputs: AL - Byte
+printhex:
+	pusha
+	push ax
+	shr ax, 4
+	call .printone
+	pop ax
+	call .printone
+	popa
+	ret
+	
+	.printone:
+		pusha
+		and ax, 0Fh
+		cmp ax, 9
+		jle .format
+		add ax, 'A'-'9'-1
+	
+	.format:
+		add ax, '0'
+		mov ah, 0Eh
+		int 10h
+		popa
+		ret
+		

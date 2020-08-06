@@ -55,8 +55,8 @@ floppy_check_error:
 ; IN: AX - Logical sector
 ; OUT: Needed params for int 13h
 floppy_get_location:
-	push ax
 	push bx
+	push ax
 	mov bx, ax
 	mov dx, 0
 	div word [SectorsPerTrack]
@@ -73,6 +73,32 @@ floppy_get_location:
 	pop bx
 	mov dl, [BootDevice]
 	ret
+	
+floppy_read_sector_0:
+	call floppy_reset
+	pusha
+	mov ax, 0
+	call floppy_get_location
+	mov ax, 0201h
+	mov bx, Buffer
+	int 13h
+	jc .error
+	popa
+	ret
+	
+	.error:
+		mov si, floppy_error_msg
+		call printstring
+		mov al, ah
+		call printhex
+		mov al, 13
+		call printchar
+		mov al, 10
+		call printchar
+		popa
+		ret
+
+floppy_error_msg	db "Floppy error ", 0
 
 SectorsPerTrack		dw 18
 Sides				dw 2
