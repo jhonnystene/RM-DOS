@@ -99,6 +99,20 @@ floppy_read_sectors:
 		call printchar
 		popa
 		ret
+		
+; OUT: Buffer - Root Directory
+floppy_read_root_directory:
+	mov ax, 19
+	mov bl, 13
+	call floppy_read_sectors
+	ret
+
+; OUT: Buffer - FAT
+floppy_read_fat:
+	mov ax, 1
+	mov bl, 8
+	call floppy_read_sectors
+	ret
 
 floppy_error_msg	db "Floppy error ", 0
 

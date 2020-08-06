@@ -1,11 +1,8 @@
 ; Super Mega Awesome SHell (SMASH)
 ; Wanna SMASH?
 
-shell_start:
-	mov si, prompt
-	call printstring
-	mov bx, 0
-	
+get_string:
+	mov bx, 0 ; This line was missing and caused me 3 hours of debugging.
 	.loop:
 		call waitkey
 		
@@ -16,7 +13,7 @@ shell_start:
 		je .backspace
 		
 		call char_upper
-		mov byte [buffer + bx], al
+		mov byte [string_buffer + bx], al
 		inc bx
 		
 		; Are we about to write past the buffer?
@@ -31,52 +28,14 @@ shell_start:
 		call printchar
 		mov al, 10
 		call printchar
+		mov byte [string_buffer + bx], 0
+		ret
 		
-		mov byte [buffer + bx], 0
-		mov di, buffer
-		mov si, command_about
-		call stringsequal
-		jc about
-		
-		mov si, command_milestone
-		call stringsequal
-		jc milestone
-		
-		mov si, command_floppy_test
-		call stringsequal
-		jc floppy_test
-		
-		mov si, command_mode_text
-		call stringsequal
-		jc mode_text
-		
-		mov si, command_mode_video
-		call stringsequal
-		jc mode_video
-		
-		mov si, command_panic
-		call stringsequal
-		jc kpanic
-		
-		mov si, command_hex_test
-		call stringsequal
-		jc hextest
-		
-		mov si, command_floppy_dump
-		call stringsequal
-		jc floppy_dump
-		
-		mov si, command_floppy_read
-		call stringsequal
-		jc floppy_read
-		
-		jmp shell_start
-	
 	.backspace:
 		cmp bx, 0
 		je .loop
 		
-		mov byte [buffer + bx], 0
+		mov byte [string_buffer + bx], 0
 		dec bx
 		mov al, 08
 		call printchar
@@ -85,12 +44,80 @@ shell_start:
 		mov al, 08
 		call printchar
 		jmp .loop
+
+shell_start:
+	mov si, prompt
+	call printstring
+	mov bx, 0
+	
+	call get_string
+	
+	mov byte [string_buffer + bx], 0
+	mov di, string_buffer
+	
+	mov si, command_about
+	call stringsequal
+	jc about
+	
+	mov si, command_milestone
+	call stringsequal
+	jc milestone
+	
+	mov si, command_floppy_test
+	call stringsequal
+	jc floppy_test
+	
+	mov si, command_mode_text
+	call stringsequal
+	jc mode_text
+	
+	mov si, command_mode_video
+	call stringsequal
+	jc mode_video
+	
+	mov si, command_panic
+	call stringsequal
+	jc kpanic
+	
+	mov si, command_hex_test
+	call stringsequal
+	jc hextest
+	
+	mov si, command_floppy_dump
+	call stringsequal
+	jc floppy_dump
+	
+	mov si, command_floppy_read
+	call stringsequal
+	jc floppy_read
+	
+	jmp shell_start
 	
 floppy_read:
-	mov ax, 0
-	mov bl, 1
+	; First, we need to figure out where to start reading from.
+	mov si, .start_point_msg
+	call printstring
+	call get_string
+	mov si, string_buffer
+	call string_to_number
+	mov cx, ax
+	
+	; Then, we need to know how many sectors to read.
+	mov si, .count_msg
+	call printstring
+	call get_string
+	mov si, string_buffer
+	call string_to_number
+	
+	; Put the values in the proper spots, and read the sectors.
+	mov bl, al
+	mov ax, cx
 	call floppy_read_sectors
+	
 	jmp shell_start
+	
+	.start_point_msg db "Sector to start: ", 0
+	.count_msg db		"Count: ", 0
 	
 floppy_dump:
 	mov bx, 0
@@ -196,7 +223,7 @@ milestone:
 	.text_4	db "Milestone 3: Graphics APIs", 10, 13, 0
 
 prompt db "> ", 0
-buffer times 64 db 0
+string_buffer times 64 db 0
 
 command_about		db "ABOUT", 0
 command_milestone	db "MILESTONE", 0

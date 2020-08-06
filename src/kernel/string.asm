@@ -28,6 +28,26 @@ stringsequal:
 		popa
 		stc
 		ret
+
+; IN: SI - String
+; OUT: AX - Length
+string_length:
+	pusha
+	mov bx, ax
+	mov cx, 0
+	.loop:
+		cmp byte [bx], 0
+		je .done
+		inc bx
+		inc cx
+		jmp .loop
+	.done:
+		mov word [.tmp], cx
+		popa
+		mov ax, [.tmp]
+		ret
+	
+	.tmp dw 0
 	
 ; IN/OUT: AL - Character
 char_upper:
@@ -39,3 +59,44 @@ char_upper:
 	ret
 	.done:
 		ret
+		
+; IN: SI: String
+; OUT: AX: Number
+string_to_number:
+	pusha
+	mov ax, si
+	call string_length
+	add si, ax
+	dec si
+	mov cx, ax
+	mov bx, 0
+	mov ax, 0
+	mov word [.multi], 1
+	
+	.loop:
+		mov ax, 0
+		mov byte al, [si]
+		sub al, 48
+		mul word [.multi]
+		add bx, ax
+		push ax
+		mov word ax, [.multi]
+		mov dx, 10
+		mul dx
+		mov word [.multi], ax
+		pop ax
+		dec cx
+		cmp cx, 0
+		je .finish
+		dec si
+		jmp .loop
+	
+	.finish:
+		; This section works fine.
+		mov word [.tmp], bx
+		popa
+		mov word ax, [.tmp]
+		ret
+		
+		.multi dw 0
+		.tmp dw 0
