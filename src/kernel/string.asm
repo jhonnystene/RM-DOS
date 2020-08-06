@@ -3,7 +3,7 @@ fuckin_padding: ; For some fucking STUPID reason, the OS shits itself if you try
 
 ; IN: SI, DI - string 1, string 2
 ; OUT: carry if same
-stringsequal:
+string_streq:
 	pusha
 	.loop:
 		mov al, [si]
@@ -31,7 +31,7 @@ stringsequal:
 
 ; IN: SI - String
 ; OUT: AX - Length
-string_length:
+string_strlen:
 	pusha
 	mov bx, ax
 	mov cx, 0
@@ -50,7 +50,7 @@ string_length:
 	.tmp dw 0
 	
 ; IN/OUT: AL - Character
-char_upper:
+string_char_upper:
 	cmp al, 'a'
 	jb .done
 	cmp al, 'z'
@@ -62,10 +62,10 @@ char_upper:
 		
 ; IN: SI: String
 ; OUT: AX: Number
-string_to_number:
+string_to_int:
 	pusha
 	mov ax, si
-	call string_length
+	call string_strlen
 	add si, ax
 	dec si
 	mov cx, ax

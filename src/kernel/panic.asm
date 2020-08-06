@@ -1,10 +1,9 @@
-hang:
-	jmp hang
+
 
 ; Inputs: AH - Error code
 panic:
-	mov si, panicmessage_header
-	call printstring
+	mov si, panic_msg_header
+	call screen_puts
 	
 	; Do we know what the code *is*?
 	cmp ah, 0
@@ -16,25 +15,25 @@ panic:
 	jmp .finish
 	
 	.unknown: ; Code 0
-		mov si, panicmessage_unknown
-		call printstring
+		mov si, panic_msg_unknown
+		call screen_puts
 		jmp .finish
 	
 	.user: ; Code 1
-		mov si, panicmessage_user
-		call printstring
+		mov si, panic_msg_user
+		call screen_puts
 		jmp .finish
 	
 	.finish:
-		mov si, panicmessage_halted
-		call printstring
+		mov si, panic_msg_halted
+		call screen_puts
 		jmp hang
 
-panicmessage_header db "Kernel PANIC!", 13, 10, 0
-panicmessage_halted db "System halted.", 13, 10, 0
+panic_msg_header db "Kernel PANIC!", 13, 10, 0
+panic_msg_halted db "System halted.", 13, 10, 0
 
 ; Code 0
-panicmessage_unknown db "Unknown error!", 13, 10, 0
+panic_msg_unknown db "Unknown error!", 13, 10, 0
 
 ; Code 1
-panicmessage_user db "User requested panic!", 13, 10, 0
+panic_msg_user db "User requested panic!", 13, 10, 0

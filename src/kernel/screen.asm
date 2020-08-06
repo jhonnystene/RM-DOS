@@ -1,4 +1,4 @@
-enter_video_mode:
+screen_enter_video_mode:
 	pusha
 	mov ah, 00h
 	mov al, 13h
@@ -6,7 +6,7 @@ enter_video_mode:
 	popa
 	ret
 
-enter_text_mode:
+screen_enter_text_mode:
 	pusha
 	mov ah, 00h
 	mov al, 03h
@@ -14,7 +14,7 @@ enter_text_mode:
 	popa
 	ret
 
-clearscreen:
+screen_clear:
 	pusha
 	mov ah, 06h
 	mov al, 0
@@ -24,12 +24,12 @@ clearscreen:
 	mov dl, 79
 	int 10h
 	mov dx, 0
-	call setcursor
+	call screen_set_cursor
 	popa
 	ret
 	
 ; Inputs: DH - Row, DL - Column
-setcursor:
+screen_set_cursor:
 	pusha
 	mov ah, 02h
 	mov bh, 0
@@ -38,7 +38,7 @@ setcursor:
 	ret
 
 ; Inputs: SI - String
-printstring:
+screen_puts:
 	pusha
 	mov ah, 0Eh
 	mov bh, 0
@@ -56,7 +56,7 @@ printstring:
 		ret
 
 ; Inputs: AL - Character
-printchar:
+screen_putchar:
 	pusha
 	mov ah, 0Eh
 	mov bh, 0
@@ -65,8 +65,20 @@ printchar:
 	popa
 	ret
 	
+screen_newline:
+	pusha
+	mov ah, 0Eh
+	mov al, 13
+	mov bh, 0
+	mov bl, 0Fh
+	int 10h
+	mov al, 10
+	int 10h
+	popa
+	ret
+	
 ; Inputs: AL - Byte
-printhex:
+screen_print_2hex:
 	pusha
 	push ax
 	shr ax, 4
@@ -89,4 +101,14 @@ printhex:
 		int 10h
 		popa
 		ret
-		
+
+; Inputs: AX - 2 bytes
+screen_print_4hex:
+	pusha
+	mov bx, ax
+	mov al, bh
+	call screen_print_2hex
+	mov al, bl
+	call screen_print_2hex
+	popa
+	ret

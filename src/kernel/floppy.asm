@@ -90,13 +90,13 @@ floppy_read_sectors:
 
 	.error:
 		mov si, floppy_error_msg
-		call printstring
+		call screen_puts
 		mov al, ah
-		call printhex
+		call screen_print_2hex
 		mov al, 13
-		call printchar
+		call screen_putchar
 		mov al, 10
-		call printchar
+		call screen_putchar
 		popa
 		ret
 		

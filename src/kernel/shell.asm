@@ -1,10 +1,10 @@
 ; Super Mega Awesome SHell (SMASH)
 ; Wanna SMASH?
 
-get_string:
+shell_get_string:
 	mov bx, 0 ; This line was missing and caused me 3 hours of debugging.
 	.loop:
-		call waitkey
+		call keyboard_waitkey
 		
 		cmp al, 13
 		je .newline
@@ -12,7 +12,7 @@ get_string:
 		cmp al, 08
 		je .backspace
 		
-		call char_upper
+		call string_char_upper
 		mov byte [string_buffer + bx], al
 		inc bx
 		
@@ -20,14 +20,14 @@ get_string:
 		cmp bx, 63
 		je .newline
 		
-		call printchar
+		call screen_putchar
 		jmp .loop
 		
 	.newline:
 		mov al, 13
-		call printchar
+		call screen_putchar
 		mov al, 10
-		call printchar
+		call screen_putchar
 		mov byte [string_buffer + bx], 0
 		ret
 		
@@ -38,57 +38,57 @@ get_string:
 		mov byte [string_buffer + bx], 0
 		dec bx
 		mov al, 08
-		call printchar
+		call screen_putchar
 		mov al, ' '
-		call printchar
+		call screen_putchar
 		mov al, 08
-		call printchar
+		call screen_putchar
 		jmp .loop
 
 shell_start:
 	mov si, prompt
-	call printstring
+	call screen_puts
 	mov bx, 0
 	
-	call get_string
+	call shell_get_string
 	
 	mov byte [string_buffer + bx], 0
 	mov di, string_buffer
 	
 	mov si, command_about
-	call stringsequal
+	call string_streq
 	jc about
 	
 	mov si, command_milestone
-	call stringsequal
+	call string_streq
 	jc milestone
 	
 	mov si, command_floppy_test
-	call stringsequal
+	call string_streq
 	jc floppy_test
 	
 	mov si, command_mode_text
-	call stringsequal
+	call string_streq
 	jc mode_text
 	
 	mov si, command_mode_video
-	call stringsequal
+	call string_streq
 	jc mode_video
 	
 	mov si, command_panic
-	call stringsequal
+	call string_streq
 	jc kpanic
 	
 	mov si, command_hex_test
-	call stringsequal
+	call string_streq
 	jc hextest
 	
 	mov si, command_floppy_dump
-	call stringsequal
+	call string_streq
 	jc floppy_dump
 	
 	mov si, command_floppy_read
-	call stringsequal
+	call string_streq
 	jc floppy_read
 	
 	jmp shell_start
@@ -96,18 +96,18 @@ shell_start:
 floppy_read:
 	; First, we need to figure out where to start reading from.
 	mov si, .start_point_msg
-	call printstring
-	call get_string
+	call screen_puts
+	call shell_get_string
 	mov si, string_buffer
-	call string_to_number
+	call string_to_int
 	mov cx, ax
 	
 	; Then, we need to know how many sectors to read.
 	mov si, .count_msg
-	call printstring
-	call get_string
+	call screen_puts
+	call shell_get_string
 	mov si, string_buffer
-	call string_to_number
+	call string_to_int
 	
 	; Put the values in the proper spots, and read the sectors.
 	mov bl, al
@@ -119,14 +119,15 @@ floppy_read:
 	.start_point_msg db "Sector to start: ", 0
 	.count_msg db		"Count: ", 0
 	
+; TODO: Let user choose what sector to dump
 floppy_dump:
 	mov bx, 0
 	mov cx, 0
 	.loop:
 		mov al, [Buffer + bx]
-		call printhex
+		call screen_print_2hex
 		;mov al, ' '
-		;call printchar
+		;call screen_putchar
 		inc bx
 		inc cx
 		cmp bx, 512
@@ -137,34 +138,33 @@ floppy_dump:
 	
 	.newline:
 		mov al, 10
-		call printchar
+		call screen_putchar
 		mov al, 13
-		call printchar
+		call screen_putchar
 		mov cx, 0
 		jmp .loop
 		
 	.done:
 		mov al, 10
-		call printchar
+		call screen_putchar
 		mov al, 13
-		call printchar
+		call screen_putchar
 		jmp shell_start
 	
 hextest:
 	mov al, 0Fh
-	call printhex
+	call screen_print_2hex
 	jmp shell_start
 
 kpanic:
-	mov ah, 1
-	jmp panic
+	jmp kernel_panic
 
 mode_text:
-	call enter_text_mode
+	call screen_enter_text_mode
 	jmp shell_start
 
 mode_video:
-	call enter_video_mode
+	call screen_enter_video_mode
 	jmp shell_start
 		
 floppy_test:
@@ -172,30 +172,30 @@ floppy_test:
 	jc .error
 	
 	mov si, .text_good
-	call printstring
+	call screen_puts
 	
 	jmp shell_start
 	
 	.error:
 		mov si, .text_error
-		call printstring
+		call screen_puts
 		jmp shell_start
 	
 	.text_good	db "Floppy reset success!", 10, 13, 0
 	.text_error	db "Floppy reset failure!", 10, 13, 0
 		
 about:
-	mov si, kernelmsg_osname
-	call printstring
+	mov si, kernel_msg_osname
+	call screen_puts
 	
-	mov si, kernelmsg_copyright
-	call printstring
+	mov si, kernel_msg_copyright
+	call screen_puts
 	
 	mov si, .text_1
-	call printstring
+	call screen_puts
 	
 	mov si, .text_2
-	call printstring
+	call screen_puts
 	
 	jmp shell_start
 	
@@ -204,16 +204,16 @@ about:
 	
 milestone:
 	mov si, .text_1
-	call printstring
+	call screen_puts
 	
 	mov si, .text_2
-	call printstring
+	call screen_puts
 	
 	mov si, .text_3
-	call printstring
+	call screen_puts
 	
 	mov si, .text_4
-	call printstring
+	call screen_puts
 	
 	jmp shell_start
 
