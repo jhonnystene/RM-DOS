@@ -1,5 +1,58 @@
 ; Floppy programs for SMASH
 
+; Let user explore around the floppy
+floppy_explore:
+	mov cx, 0
+	
+	.loop:
+		; Clear the screen and print the logical sector number in the center of the screen.
+		call screen_clear
+		mov ah, 34
+		mov al, ' '
+		call screen_repeatchar
+		mov si, .sector_msg
+		call screen_puts
+		mov ax, cx
+		mov bx, 1
+		call screen_print_4hex
+		call screen_newline
+		
+		; Load in the logical sector and write it to the screen.
+		call floppy_read_sectors
+		call screen_dump_floppy_sector
+		call screen_newline
+		
+		; Print out the controls in the middle of the screen.
+		mov ah, 12
+		mov al, ' '
+		call screen_repeatchar
+		mov si, .controls_msg
+		call screen_puts
+		
+		; Get the key pressed and check to see if it's a real command.
+		call keyboard_waitkey
+		call string_char_upper
+		cmp al, 'A'
+		je .back
+		cmp al, 'D'
+		je .forward
+		cmp al, 'S'
+		je shell_start
+		jmp .loop
+	
+	.back:
+		cmp cx, 0
+		je .loop
+		dec cx
+		jmp .loop
+	
+	.forward:
+		inc cx
+		jmp .loop
+	
+	.sector_msg		db "Sector: ", 0
+	.controls_msg	db "A: Move back a sector, D: Move forward a sector, S: Exit", 13, 10, 0
+
 ; Read floppy data into memory
 floppy_read:
 	; First, we need to figure out where to start reading from.
@@ -31,6 +84,7 @@ floppy_read:
 ; Show a hexdump of first loaded sector
 ; TODO: Let user choose what sector to dump
 floppy_dump:
+	pusha
 	mov bx, 0
 	mov cx, 0
 	.loop:
@@ -47,18 +101,13 @@ floppy_dump:
 		jmp .loop
 	
 	.newline:
-		mov al, 10
-		call screen_putchar
-		mov al, 13
-		call screen_putchar
+		call screen_newline
 		mov cx, 0
 		jmp .loop
 		
 	.done:
-		mov al, 10
-		call screen_putchar
-		mov al, 13
-		call screen_putchar
+		call screen_newline
+		popa
 		jmp shell_start
 
 ; Try to reset the floppy drive
@@ -76,9 +125,10 @@ floppy_test:
 		call screen_puts
 		jmp shell_start
 	
-	.text_good	db "Floppy reset success!", 10, 13, 0
-	.text_error	db "Floppy reset failure!", 10, 13, 0
+	.text_good		db "Floppy reset success!", 10, 13, 0
+	.text_error		db "Floppy reset failure!", 10, 13, 0
 	
-command_floppy_test	db "FLOPPY RESET", 0
-command_floppy_dump db "FLOPPY DUMP", 0
-command_floppy_read db "FLOPPY READ", 0
+command_floppy_test			db "FLOPPY RESET", 0
+command_floppy_dump 		db "FLOPPY DUMP", 0
+command_floppy_read 		db "FLOPPY READ", 0
+command_floppy_explore		db "FLOPPY EXPLORE", 0

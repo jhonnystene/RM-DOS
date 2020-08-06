@@ -112,3 +112,55 @@ screen_print_4hex:
 	call screen_print_2hex
 	popa
 	ret
+	
+screen_dump_floppy_sector:
+	pusha
+	mov bx, 0
+	mov cx, 0
+	call .spaces
+	
+	.loop:
+		mov al, [Buffer + bx]
+		call screen_print_2hex
+		;mov al, ' '
+		;call screen_putchar
+		inc bx
+		inc cx
+		cmp bx, 512
+		je .done
+		cmp cx, 32
+		je .newline
+		jmp .loop
+	
+	.spaces:
+		push ax
+		mov al, ' '
+		mov ah, 8
+		call screen_repeatchar
+		pop ax
+		ret
+	
+	.newline:
+		call screen_newline
+		mov cx, 0
+		call .spaces
+		jmp .loop
+		
+	.done:
+		call screen_newline
+		popa
+		ret
+		
+; In: AH, AL: Count, Char
+screen_repeatchar:
+	pusha
+	.loop:
+		cmp ah, 0
+		je .done
+		call screen_putchar
+		dec ah
+		jmp .loop
+	
+	.done:
+		popa
+		ret
