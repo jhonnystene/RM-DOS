@@ -18,7 +18,7 @@ screen_clear:
 	pusha
 	mov ah, 06h
 	mov al, 0
-	mov bh, 0Fh
+	mov bh, 07h
 	mov cx, 0
 	mov dh, 24
 	mov dl, 79
@@ -120,7 +120,7 @@ screen_dump_floppy_sector:
 	call .spaces
 	
 	.loop:
-		mov al, [Buffer + bx]
+		mov al, [floppy_buffer + bx]
 		call screen_print_2hex
 		;mov al, ' '
 		;call screen_putchar

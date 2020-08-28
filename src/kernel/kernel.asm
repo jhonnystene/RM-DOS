@@ -31,9 +31,9 @@ callvectors:
 	jmp floppy_reset 				; Reset the floppy controller.
 	jmp floppy_check_error			; Check if an error has occurred in the floppy controller.
 	jmp floppy_get_location			; Returns the needed registers for int 13h for a given logical sector.
-	jmp floppy_read_sectors			; Reads any number of sectors into the disk buffer.
-	jmp floppy_read_root_directory	; Loads the FAT16 root directory into the disk buffer.
-	jmp floppy_read_fat				; Loads the first FAT into the disk buffer.
+	jmp floppy_read_sectors			; Reads any number of sectors into the disk floppy_buffer.
+	;jmp floppy_read_root_directory	; Loads the FAT16 root directory into the disk floppy_buffer.
+	;jmp floppy_read_fat				; Loads the first FAT into the disk floppy_buffer.
 	
 	; String functions
 	jmp string_streq				; Check if two strings are equal.
@@ -61,13 +61,7 @@ kernel_bootstrap:
 	jmp kernel_init
 
 kernel_init:
-	; Print welcome message
 	call screen_clear
-	mov si, kernel_msg_osname
-	call screen_puts
-	mov si, kernel_msg_copyright
-	call screen_puts
-	
 	call shell_start
 	
 	; We should never get here unless the shell crashed
@@ -131,6 +125,9 @@ kernel_panic_msg_di				db "DI: ", 0
 
 ; LIBRARIES
 %include "src/kernel/libraries/string.asm"
+%include "src/kernel/libraries/fat12.asm"
 
 ; OTHER
 %include "src/kernel/shell/shell.asm"
+
+file_floppy_buffer times 2048 db 0
