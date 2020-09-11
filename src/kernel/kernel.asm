@@ -104,6 +104,28 @@ kernel_dump_regs:
 	popa
 	ret
 	
+; MEMORY MANAGEMENT
+
+; In: AX, BX - Buffer location, bytes to zero
+kernel_memory_erase:
+	pusha
+	mov cx, bx
+	mov bx, ax
+	mov ax, 0
+	
+	.loop:
+		cmp cx, 0
+		je .done
+		
+		mov [bx], ax ; AX is always zero
+		inc bx
+		dec cx
+		jmp .loop
+		
+	.done:
+		popa
+		ret
+
 ; In: AX, BX, CX - Starting location, ending location, bytes to copy
 ; Out: BX - CX bytes from AX
 kernel_memory_copy:

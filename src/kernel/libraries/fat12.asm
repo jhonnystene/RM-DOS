@@ -50,6 +50,11 @@ fat12_get_filename:
 	
 	call fat12_read_root_directory_entry
 	
+	; Skip lengthy memory copy if we don't have a file here
+	mov ax, [fat12_root_directory_buffer]
+	cmp ax, 0
+	je .error
+	
 	mov ax, fat12_root_directory_buffer
 	mov cx, 12
 	call kernel_memory_copy

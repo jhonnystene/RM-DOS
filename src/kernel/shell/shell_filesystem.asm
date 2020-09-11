@@ -3,14 +3,21 @@ shell_fs_test:
 	mov bx, .filename_buffer
 
 	.loop:
-		call fat12_get_filename
-		inc ax
 		cmp ax, fat12_max_root_directory_entries
 		je .done
-		mov cx, [.filename_buffer]
-		cmp cx, 0
-		jne .display
-		jmp .display
+	
+		push ax
+		push bx
+		mov ax, .filename_buffer
+		mov bx, 12
+		call kernel_memory_erase
+		pop bx
+		pop ax
+		
+		call fat12_get_filename
+		inc ax
+		jnc .display
+		
 		jmp .loop
 		
 	.display:
