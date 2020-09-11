@@ -55,9 +55,9 @@ kernel_bootstrap:
 	cld
 	mov ax, 2000h
 	mov ds, ax
-	mov es, ax
-	mov fs, ax
 	mov gs, ax
+	mov fs, ax
+	mov es, ax
 	jmp kernel_init
 
 kernel_init:
@@ -104,6 +104,32 @@ kernel_dump_regs:
 	popa
 	ret
 	
+; In: AX, BX, CX - Starting location, ending location, bytes to copy
+; Out: BX - CX bytes from AX
+kernel_memory_copy:
+	pusha
+
+	.loop:
+		; Make sure we still need to copy more bytes
+		cmp cx, 0
+		je .done
+		
+		push bx
+		mov bx, ax
+		mov dx, [bx]
+		pop bx
+		mov [bx], dx
+		
+		inc ax
+		inc bx
+		
+		dec cx
+		jmp .loop
+	
+	.done:
+		popa
+		ret
+	
 ; BOOT MESSAGES
 kernel_msg_osname	 			db "The Real Mode Disk Operating System (RM-DOS)", 13, 10, 0
 kernel_msg_copyright			db "Copyright (c) 2020 Johnny Stene. Some Rights Reserved.", 13, 10, 0
@@ -129,5 +155,3 @@ kernel_panic_msg_di				db "DI: ", 0
 
 ; OTHER
 %include "src/kernel/shell/shell.asm"
-
-file_floppy_buffer times 2048 db 0

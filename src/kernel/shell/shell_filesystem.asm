@@ -1,22 +1,28 @@
 shell_fs_test:
-	mov si, .testing_message
-	call screen_puts
-	mov si, .kernel_filename
-	call fat12_search_for_file
-	jc .found
-	mov si, .not_found_message
-	call screen_puts
-	jmp shell_start
-	
-	.found:
-		mov si, .found_message
+	mov ax, 1
+	mov bx, .filename_buffer
+
+	.loop:
+		call fat12_get_filename
+		inc ax
+		cmp ax, fat12_max_root_directory_entries
+		je .done
+		mov cx, [.filename_buffer]
+		cmp cx, 0
+		jne .display
+		jmp .display
+		jmp .loop
+		
+	.display:
+		mov si, .filename_buffer
 		call screen_puts
+		call screen_newline
+		jmp .loop
+		
+	.done:
 		jmp shell_start
 	
-	.kernel_filename	db "KERNEL  BIN", 0
-	.found_message		db "Test PASS!", 13, 10, 0
-	.not_found_message	db "Test FAIL - KERNEL.BIN not found.", 13, 10, 0
-	.testing_message	db "Testing...", 13, 10, 0
+	.filename_buffer times 12 db 0
 
 shell_fs_dump:
 	mov ax, 0

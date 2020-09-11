@@ -35,6 +35,35 @@
 ;	Bit 5: 		Archive
 ;	Bit 6-7:	Unused
 
+fat12_max_root_directory_entries	equ 208 ; Maximum amount of root directory entries
+
+; IN: AX, BX - Directory Entry Number, location of buffer
+; OUT: Carry set on error, Buffer filled on no error
+fat12_get_filename:
+	pusha
+	
+	cmp ax, fat12_max_root_directory_entries ; Are we trying to read past the max amount of entries?
+	ja .error ; If so, skip
+	
+	cmp ax, 0
+	je .error
+	
+	call fat12_read_root_directory_entry
+	
+	mov ax, fat12_root_directory_buffer
+	mov cx, 12
+	call kernel_memory_copy
+	
+	.success:
+		popa
+		clc
+		ret
+	
+	.error:
+		popa
+		stc
+		ret
+
 ; OUT: floppy_buffer - Root Directory
 fat12_read_root_directory:
 	pusha
@@ -117,10 +146,11 @@ fat12_search_for_file:
 	mov di, .filename_buffer
 	
 	.next_entry:
-		cmp cx, 208
-		je .file_not_found
-		call .read_entry
-		mov bx, 0
+		cmp cx, fat12_max_root_directory_entries ; Have we hit the end of the root directory entries?
+		je .file_not_found ; If so, the file isn't on disk
+		
+		call .read_entry ; Read the next entry
+		mov bx, 0 ; Reset position
 		
 	.next_byte:
 		mov byte al, [fat12_root_directory_buffer + bx] ; Load a byte into AL
@@ -146,20 +176,6 @@ fat12_search_for_file:
 		mov di, .filename_buffer
 		call string_streq
 		jc .file_found
-		
-		pusha
-		push si
-		mov si, .debug_expected_message
-		call screen_puts
-		pop si
-		call screen_puts
-		call screen_newline
-		mov si, .debug_got_message
-		call screen_puts
-		mov si, .filename_buffer
-		call screen_puts
-		call screen_newline
-		popa
 		
 		inc cx
 		jmp .next_entry
@@ -197,9 +213,5 @@ fat12_search_for_file:
 		ret
 
 	.filename_buffer times 12 db 0
-	
-	.debug_not_in_entry_message db "DEBUG: Not in entry ", 0
-	.debug_expected_message db "EXPECTED: ", 0
-	.debug_got_message db "GOT: ", 0
 	
 fat12_root_directory_buffer times 32 db 0
