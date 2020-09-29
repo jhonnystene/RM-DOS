@@ -6,44 +6,55 @@ BITS 16
 
 callvectors:
 	; Core kernel functions
-	jmp kernel_bootstrap			; Setup stack and segmenting, then call kernel_init.
-	jmp kernel_init					; Do any needed init functions, then start the shell.
-	jmp kernel_hang					; Freeze the kernel
-	jmp kernel_panic				; Dump registers and hang.
+	jmp kernel_bootstrap				; Setup stack and segmenting, then call kernel_init.
+	jmp kernel_init						; Do any needed init functions, then start the shell.
+	jmp kernel_hang						; Freeze the kernel
+	jmp kernel_panic					; Dump registers and hang.
+	jmp kernel_dump_regs				; Dump CPU registers to screen.
+	
+	; Kernel memory functions	
+	jmp kernel_memory_copy				; Copy memory from one location to another
+	jmp kernel_memory_erase				; Erase a chunk of memory
 	
 	; Screen driver functions
-	jmp screen_enter_video_mode		; Switch to video mode
-	jmp screen_enter_text_mode		; Switch to text mode
-	jmp screen_clear				; Empty the screen
-	jmp screen_set_cursor			; Set the cursor position
-	jmp screen_puts					; Print a string to the screen.
-	jmp screen_putchar				; Print a single character to the screen.
-	jmp screen_newline				; Print a newline + carriage return.
-	jmp screen_print_2hex			; Print an 8-bit value to screen.
-	jmp screen_print_4hex			; Print a 16-bit value to screen.
-	jmp screen_repeatchar			; Print a character repeatedly.
-	jmp screen_dump_floppy_sector	; Dump floppy sector to screen.
+	jmp screen_enter_video_mode			; Switch to video mode
+	jmp screen_enter_text_mode			; Switch to text mode
+	jmp screen_clear					; Empty the screen
+	jmp screen_set_cursor				; Set the cursor position
+	jmp screen_puts						; Print a string to the screen.
+	jmp screen_putchar					; Print a single character to the screen.
+	jmp screen_newline					; Print a newline + carriage return.
+	jmp screen_print_2hex				; Print an 8-bit value to screen.
+	jmp screen_print_4hex				; Print a 16-bit value to screen.
+	jmp screen_repeatchar				; Print a character repeatedly.
+	jmp screen_dump_floppy_sector		; Dump floppy sector to screen.
+	jmp screen_repeatchar				; Repeat a character on screen.
 	
-	; Keyboard driver functions
-	jmp keyboard_waitkey 			; Wait for a key to be pressed, and return that key.
+	; Keyboard driver functions	
+	jmp keyboard_waitkey 				; Wait for a key to be pressed, and return that key.
 	
 	; Floppy driver functions
-	jmp floppy_reset 				; Reset the floppy controller.
-	jmp floppy_check_error			; Check if an error has occurred in the floppy controller.
-	jmp floppy_get_location			; Returns the needed registers for int 13h for a given logical sector.
-	jmp floppy_read_sectors			; Reads any number of sectors into the disk floppy_buffer.
-	;jmp floppy_read_root_directory	; Loads the FAT16 root directory into the disk floppy_buffer.
-	;jmp floppy_read_fat				; Loads the first FAT into the disk floppy_buffer.
+	jmp floppy_reset 					; Reset the floppy controller.
+	jmp floppy_check_error				; Check if an error has occurred in the floppy controller.
+	jmp floppy_get_location				; Returns the needed registers for int 13h for a given logical sector.
+	jmp floppy_read_sectors				; Reads any number of sectors into the disk floppy_buffer.
+		
+	; FAT12 functions	
+	jmp fat12_get_filename				; Get a filename for a given root directory entry
+	jmp fat12_read_fat					; Read FAT into memory
+	jmp fat12_read_root_directory		; Read root directory into memory
+	jmp fat12_read_root_directory_entry	; Read root directory entry into memory
+	jmp fat12_search_for_file			; Check if file exists
 	
 	; String functions
-	jmp string_streq				; Check if two strings are equal.
-	jmp string_strlen				; Check the length of a string.
-	jmp string_char_upper			; Return the uppercase version of a character.
-	jmp string_to_int				; Convert a string to an integer.
+	jmp string_streq					; Check if two strings are equal.
+	jmp string_strlen					; Check the length of a string.
+	jmp string_char_upper				; Return the uppercase version of a character.
+	jmp string_to_int					; Convert a string to an integer.
 	
 	; Shell functions
-	jmp shell_get_string			; Get a string as input.
-	jmp shell_start					; Initialize the shell.
+	jmp shell_get_string				; Get a string as input.
+	jmp shell_start						; Initialize the shell.
 
 ; Setup stack and segmenting and boot OS
 kernel_bootstrap:
