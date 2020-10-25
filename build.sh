@@ -12,6 +12,26 @@ fi
 nasm -O0 -w+orphan-labels -f bin -o src/bootloader/boot.bin src/bootloader/boot.asm || exit
 dd status=noxfer conv=notrunc if=src/bootloader/boot.bin of=images/bismuth.flp || exit
 
+function recurse_compile {
+	echo "Compiling directory $1..."
+	cd $1
+	for filename in *; do
+		if [ ! -f "$filename" ]; then
+			recurse_compile $filename
+		else
+			if [ ${filename: -4} == ".zyr" ]; then
+				echo "Compiling file $filename into ${filename%.zyr}.asm..."
+				zephyr $filename ${filename%.zyr}.asm
+			fi
+		fi
+
+	done
+	cd ..
+}
+
+echo "Compiling Zephyr files..."
+recurse_compile src
+
 nasm -O0 -w+orphan-labels -f bin -o src/kernel/kernel.bin src/kernel/kernel.asm || exit
 
 rm -rf tmp-loop

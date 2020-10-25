@@ -90,78 +90,6 @@ kernel_panic:
 	call screen_puts
 	call kernel_dump_regs
 	jmp kernel_hang
-
-kernel_dump_regs:
-	pusha
-	mov si, kernel_panic_msg_ax
-	call screen_puts
-	call screen_print_4hex
-	call screen_newline
-	mov si, kernel_panic_msg_bx
-	call screen_puts
-	mov ax, bx
-	call screen_print_4hex
-	call screen_newline
-	mov si, kernel_panic_msg_cx
-	call screen_puts
-	mov ax, cx
-	call screen_print_4hex
-	call screen_newline
-	mov si, kernel_panic_msg_dx
-	call screen_puts
-	mov ax, dx
-	call screen_print_4hex
-	call screen_newline
-	popa
-	ret
-	
-; MEMORY MANAGEMENT
-
-; In: AX, BX - Buffer location, bytes to zero
-kernel_memory_erase:
-	pusha
-	mov cx, bx
-	mov bx, ax
-	mov ax, 0
-	
-	.loop:
-		cmp cx, 0
-		je .done
-		
-		mov [bx], ax ; AX is always zero
-		inc bx
-		dec cx
-		jmp .loop
-		
-	.done:
-		popa
-		ret
-
-; In: AX, BX, CX - Starting location, ending location, bytes to copy
-; Out: BX - CX bytes from AX
-kernel_memory_copy:
-	pusha
-
-	.loop:
-		; Make sure we still need to copy more bytes
-		cmp cx, 0
-		je .done
-		
-		push bx
-		mov bx, ax
-		mov dx, [bx]
-		pop bx
-		mov [bx], dx
-		
-		inc ax
-		inc bx
-		
-		dec cx
-		jmp .loop
-	
-	.done:
-		popa
-		ret
 	
 ; BOOT MESSAGES
 kernel_msg_osname	 			db "The Real Mode Disk Operating System (RM-DOS)", 13, 10, 0
@@ -176,6 +104,10 @@ kernel_panic_msg_cx				db "CX: ", 0
 kernel_panic_msg_dx				db "DX: ", 0
 kernel_panic_msg_si				db "SI: ", 0
 kernel_panic_msg_di				db "DI: ", 0
+
+; KERNEL "MODULES"
+%include "src/kernel/modules/printregs.asm"
+%include "src/kernel/modules/memory.asm"
 
 ; DRIVERS
 %include "src/kernel/drivers/floppy.asm"
