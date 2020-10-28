@@ -1,0 +1,15 @@
+#library
+
+#global byte keyboard_buffer = 0
+
+func keyboard_waitkey() {
+	push_all();
+	ax = 0;
+	ah = 10h;
+	inturrupt(16h);
+	
+	[keyboard_buffer] = ax;
+	pop_all();
+	ax = [keyboard_buffer];
+	return;
+}

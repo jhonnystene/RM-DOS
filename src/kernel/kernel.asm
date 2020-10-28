@@ -4,7 +4,7 @@
 
 BITS 16
 
-callvectors:
+callvectors: ; TODO: Update these
 	; Core kernel functions
 	jmp kernel_bootstrap				; Setup stack and segmenting, then call kernel_init.
 	jmp kernel_init						; Do any needed init functions, then start the shell.
@@ -55,6 +55,15 @@ callvectors:
 	; Shell functions
 	jmp shell_get_string				; Get a string as input.
 	jmp shell_start						; Initialize the shell.
+	
+	; IRQ and PIT functions
+	jmp irq_IRQ0_handler
+	jmp irq_init_pit
+	jmp irq_init_ivt
+	
+	; A20 Line Functions
+	jmp a20_enable
+	jmp a20_enable_fast
 
 ; Setup stack and segmenting and boot OS
 kernel_bootstrap:
@@ -73,50 +82,42 @@ kernel_bootstrap:
 
 kernel_init:
 	call screen_clear
+	
+	call irq_init_ivt
+	;call irq_init_pit ; This causes issues for some reason so I'm scrapping it for now.
+	
+	call a20_enable_fast
+	
+	mov si, kernel_msg_welcome
+	call screen_puts
+	
 	call shell_start
 	
 	; We should never get here unless the shell crashed
 	jmp kernel_panic
-	
-kernel_hang:
-	jmp kernel_hang
 
-kernel_panic:
-	mov dx, 0
-	call screen_set_cursor
-	mov si, kernel_panic_msg
-	call screen_puts
-	mov si, kernel_panic_msg_halted
-	call screen_puts
-	call kernel_dump_regs
-	jmp kernel_hang
-	
-; BOOT MESSAGES
-kernel_msg_osname	 			db "The Real Mode Disk Operating System (RM-DOS)", 13, 10, 0
-kernel_msg_copyright			db "Copyright (c) 2020 Johnny Stene. Some Rights Reserved.", 13, 10, 0
+; LOCALISATION
+; Only one line should be included - the kernel needs to be built with the desired locale
+%include "src/kernel/locales/EN-US.asm"
 
-; PANIC MESSAGES
-kernel_panic_msg				db "Kernel PANIC!", 13, 10, 0
-kernel_panic_msg_halted			db "System halted.", 13, 10, 0
-kernel_panic_msg_ax				db "AX: ", 0
-kernel_panic_msg_bx				db "BX: ", 0
-kernel_panic_msg_cx				db "CX: ", 0
-kernel_panic_msg_dx				db "DX: ", 0
-kernel_panic_msg_si				db "SI: ", 0
-kernel_panic_msg_di				db "DI: ", 0
+; TODO: Organize the below better
 
 ; KERNEL "MODULES"
 %include "src/kernel/modules/printregs.asm"
 %include "src/kernel/modules/memory.asm"
+%include "src/kernel/modules/panic.asm"
+%include "src/kernel/modules/statusmessages.asm" ; TODO: Does this belong in the screen driver?
 
 ; DRIVERS
 %include "src/kernel/drivers/floppy.asm"
 %include "src/kernel/drivers/screen.asm"
 %include "src/kernel/drivers/keyboard.asm"
+%include "src/kernel/drivers/irq.asm" ; TODO: This isn't *really* a driver, is it?
+%include "src/kernel/drivers/a20.asm" ; TODO: This isn't *really* a driver, is it? - TODO: Does this belong in the memory driver?
 
 ; LIBRARIES
 %include "src/kernel/libraries/string.asm"
-%include "src/kernel/libraries/fat12.asm"
+%include "src/kernel/libraries/fat12.asm" ; TODO: This isn't *really* a library, is it?
 
 ; OTHER
 %include "src/kernel/shell/shell.asm"

@@ -64,7 +64,7 @@ floppy_read_sectors:
 		popa
 		ret
 
-floppy_error_msg	db "Floppy error ", 0
+floppy_error_msg	db "[floppy.asm] Floppy error ", 0
 
 floppy_sectors_per_track		dw 18
 floppy_sides					dw 2

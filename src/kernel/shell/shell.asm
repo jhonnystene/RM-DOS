@@ -55,6 +55,7 @@ string_buffer times 64 db 0
 %include "src/kernel/shell/shell_kernel.asm"
 %include "src/kernel/shell/shell_edit.asm"
 %include "src/kernel/shell/shell_filesystem.asm"
+%include "src/kernel/shell/shell_ui.asm"
 
 shell_start:
 	mov si, prompt
@@ -72,5 +73,6 @@ shell_start:
 	%include "src/kernel/shell/shell_kernel_commands.asm"
 	%include "src/kernel/shell/shell_edit_commands.asm"
 	%include "src/kernel/shell/shell_filesystem_commands.asm"
+	%include "src/kernel/shell/shell_ui_commands.asm"
 		
 	jmp shell_start

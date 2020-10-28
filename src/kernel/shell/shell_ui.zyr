@@ -1,0 +1,48 @@
+#library
+
+#global string command_bottombar = "BOTTOMBAR"
+
+func shell_bottombar() {
+	screen_clear();
+	
+	byte prev_column = 0;
+	byte prev_row = 0;
+	
+	string text = "RM-DOS BY JOHNNY STENE";
+	
+	// Get the previous column
+	ah = 03h;
+	bh = 0;
+	inturrupt(10h);
+	[.prev_column] = dl;
+	[.prev_row] = dh;
+	
+	// Set our cursor position to the bottom
+	dh = 24;
+	dl = 0;
+	screen_set_cursor();
+	
+	// Draw bottom bar
+	ah = 28;
+	al = '#';
+	screen_repeatchar();
+	
+	al = '$';
+	screen_putchar();
+	
+	si = .text;
+	screen_puts();
+	
+	al = '$';
+	screen_putchar();
+	
+	ah = 28;
+	al = '#';
+	screen_repeatchar();
+	
+	dh = 0;
+	dl = 0;
+	screen_set_cursor();
+	jump shell_start();
+}
+// RM-DOS BY JOHNNY STENE

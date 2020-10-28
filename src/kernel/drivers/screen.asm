@@ -40,15 +40,28 @@ screen_set_cursor:
 ; Inputs: SI - String
 screen_puts:
 	pusha
-	mov ah, 0Eh
-	mov bh, 0
-	mov bl, 0Fh
 	.loop:
 		lodsb
 		cmp al, 0
 		je .done
 		
-		int 10h
+		call screen_putchar
+		jmp .loop
+	
+	.done:
+		popa
+		ret
+
+; Inputs: SI, BL - String, Color
+screen_color_puts:
+	pusha
+	.loop:
+		lodsb
+		cmp al, 0
+		je .done
+		
+		call screen_putchar_color
+		
 		jmp .loop
 	
 	.done:
@@ -57,13 +70,84 @@ screen_puts:
 
 ; Inputs: AL - Character
 screen_putchar:
-	pusha
-	mov ah, 0Eh
-	mov bh, 0
+	push bx
 	mov bl, 0Fh
-	int 10h
-	popa
+	call screen_putchar_color
+	pop bx
 	ret
+
+; Inputs: AL, BL - Character, color
+screen_putchar_color:
+	pusha
+	
+	; Carriage return?
+	cmp al, 13
+	je .carriage_return
+	
+	; Line feed?
+	cmp al, 10
+	je .line_feed
+	
+	; Backspace?
+	cmp al, 8
+	je .backspace
+	
+	; Print character
+	mov ah, 09h
+	mov bh, 0
+	mov cx, 1
+	int 10h
+	
+	; Get cursor position and increment
+	mov ah, 03h
+	int 10h
+	inc dl
+	cmp dl, 80 ; End of line?
+	je .newline ; Do a newline
+	
+	; Set the cursor position to the new position and return
+	.finish:
+		mov ah, 02h
+		mov bh, 0
+		int 10h
+		popa
+		ret
+	
+	; Line feed + carriage return.
+	.newline:
+		mov dl, 0
+		inc dh
+		jmp .finish
+	
+	; Just go to the start of the line.
+	.carriage_return:
+		mov ah, 03h
+		mov bl, 0
+		int 10h
+		mov dl, 0
+		jmp .finish
+	
+	; Go to this same spot, but on the line below.
+	.line_feed:
+		mov ah, 03h
+		mov bl, 0
+		int 10h
+		inc dh
+		jmp .finish
+	
+	; Delete this character.
+	.backspace:
+		mov ah, 03h
+		mov bl, 0
+		int 10h
+		dec dl
+		
+		mov ah, 09h
+		mov al, ' '
+		mov cx, 1
+		int 10h
+		
+		jmp .finish
 	
 screen_newline:
 	pusha
@@ -97,8 +181,7 @@ screen_print_2hex:
 	
 	.format:
 		add ax, '0'
-		mov ah, 0Eh
-		int 10h
+		call screen_putchar
 		popa
 		ret
 
