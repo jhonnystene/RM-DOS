@@ -2,31 +2,60 @@
 
 func kernel_dump_regs() {
 	push_all();
+	push(si);
 	
 	// Print AX
-	si = kernel_panic_msg_ax;
+	si = kernel_msg_ax;
+	screen_puts();
+	si = kernel_msg_hex;
 	screen_puts();
 	screen_print_4hex();
-	screen_newline();
+	si = kernel_msg_reg_spacer;
+	screen_puts();
 	
 	// Print BX
-	si = kernel_panic_msg_bx;
+	si = kernel_msg_bx;
+	screen_puts();
+	si = kernel_msg_hex;
 	screen_puts();
 	ax = bx;
 	screen_print_4hex();
 	screen_newline();
 	
 	// Print CX
-	si = kernel_panic_msg_cx;
+	si = kernel_msg_cx;
+	screen_puts();
+	si = kernel_msg_hex;
 	screen_puts();
 	ax = cx;
 	screen_print_4hex();
-	screen_newline();
+	si = kernel_msg_reg_spacer;
+	screen_puts();
 	
 	// Print DX
-	si = kernel_panic_msg_dx;
+	si = kernel_msg_dx;
+	screen_puts();
+	si = kernel_msg_hex;
 	screen_puts();
 	ax = dx;
+	screen_print_4hex();
+	screen_newline();
+	
+	si = kernel_msg_si;
+	screen_puts();
+	si = kernel_msg_hex;
+	screen_puts();
+	pop(si);
+	ax = si;
+	screen_print_4hex();
+	si = kernel_msg_reg_spacer;
+	screen_puts();
+	
+	si = kernel_msg_di;
+	screen_puts();
+	si = kernel_msg_hex;
+	screen_puts();
+	ax = di;
 	screen_print_4hex();
 	screen_newline();
 	

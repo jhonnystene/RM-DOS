@@ -5,17 +5,87 @@ irq_IRQ0_handler:
 	
 	.inturrupt_msg db "INT!", 0
 
+; Inputs: AX, BX - Inturrupt number, Inturrupt location
+irq_register:
+	pusha
+	mov dx, ax ; We need to use AX
+	mov cx, bx ; We need to use BX
+	
+	; We need to swap into segment 0
+	mov ax, 0000h
+	mov ds, ax
+	mov gs, ax
+	mov fs, ax
+	mov es, ax
+	
+	mov ax, 2000h ; Our inturrupt is likely in kernel code (Segment 2000h)
+	
+	; We need to figure out *where* the inturrupt is that we want to overwrite
+	mov bx, 0
+	
+	.loop:
+		cmp dx, 0
+		je .finish
+		
+		add bx, 4
+		dec dx
+		jmp .loop
+	
+	.finish:
+		; Now that we have the inturrupt location in BX, we can write our inturrupt location
+		mov [bx], cx ; Location
+		add bx, 2
+		mov [bx], ax ; Segment
+		
+		; Switch back to the kernel segment and return
+		mov ds, ax
+		mov gs, ax
+		mov fs, ax
+		mov es, ax
+		
+		popa
+		ret
+
 irq_init_ivt:
 	pusha
 	mov si, .initializing_msg
 	mov al, kernel_status_waiting
 	call kernel_print_status
 	
-	mov eax, 0000H
-	mov ebx, 0x0020
-	add ebx, eax
-	mov eax, [irq_IRQ0_handler]
-	mov [ebx], eax
+	; Divide by zero error
+	mov ax, 0
+	mov bx, kernel_panic_divzero
+	call irq_register
+	
+	; Bound Range Exceeded error
+	mov ax, 5
+	mov bx, kernel_panic_boundrange
+	call irq_register
+	
+	; Invalid Opcode error
+	mov ax, 6
+	mov bx, kernel_panic_opcode
+	call irq_register
+	
+	; Device Not Available error
+	mov ax, 7
+	mov bx, kernel_panic_devicegone
+	call irq_register
+	
+	; Invalid TSS error
+	mov ax, 10
+	mov bx, kernel_panic_TSS
+	call irq_register
+	
+	; Segment Not Present error
+	mov ax, 11
+	mov bx, kernel_panic_seggone
+	call irq_register
+	
+	; Stack Segment error
+	mov ax, 12
+	mov bx, kernel_panic_stackseg
+	call irq_register
 	
 	mov si, .initializing_msg
 	mov al, kernel_status_ok

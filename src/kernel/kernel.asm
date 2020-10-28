@@ -60,10 +60,6 @@ callvectors: ; TODO: Update these
 	jmp irq_IRQ0_handler
 	jmp irq_init_pit
 	jmp irq_init_ivt
-	
-	; A20 Line Functions
-	jmp a20_enable
-	jmp a20_enable_fast
 
 ; Setup stack and segmenting and boot OS
 kernel_bootstrap:
@@ -86,7 +82,7 @@ kernel_init:
 	call irq_init_ivt
 	;call irq_init_pit ; This causes issues for some reason so I'm scrapping it for now.
 	
-	call a20_enable_fast
+	call kernel_enable_a20
 	
 	mov si, kernel_msg_welcome
 	call screen_puts
@@ -104,7 +100,6 @@ kernel_init:
 
 ; KERNEL "MODULES"
 %include "src/kernel/modules/printregs.asm"
-%include "src/kernel/modules/memory.asm"
 %include "src/kernel/modules/panic.asm"
 %include "src/kernel/modules/statusmessages.asm" ; TODO: Does this belong in the screen driver?
 
@@ -112,8 +107,9 @@ kernel_init:
 %include "src/kernel/drivers/floppy.asm"
 %include "src/kernel/drivers/screen.asm"
 %include "src/kernel/drivers/keyboard.asm"
+%include "src/kernel/drivers/memory.asm"
 %include "src/kernel/drivers/irq.asm" ; TODO: This isn't *really* a driver, is it?
-%include "src/kernel/drivers/a20.asm" ; TODO: This isn't *really* a driver, is it? - TODO: Does this belong in the memory driver?
+;%include "src/kernel/drivers/a20.asm" ; TODO: This isn't *really* a driver, is it? - TODO: Does this belong in the memory driver?
 
 ; LIBRARIES
 %include "src/kernel/libraries/string.asm"

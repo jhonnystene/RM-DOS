@@ -30,3 +30,16 @@ jmp .loop
 kernel_memory_erase_done:
 popa
 ret
+kernel_enable_a20:
+pusha
+mov si, .enabling_msg
+mov al, kernel_status_waiting
+call kernel_print_status
+in al, 0x92
+or al, 2
+out 0x92, al
+mov al, kernel_status_ok
+call kernel_print_status
+popa
+ret
+.enabling_msg db "Enabling A20 line...", 0 , 0
