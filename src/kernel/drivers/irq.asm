@@ -48,7 +48,7 @@ irq_register:
 
 irq_init_ivt:
 	pusha
-	mov si, .initializing_msg
+	mov si, kernel_msg_initializing_ivt
 	mov al, kernel_status_waiting
 	call kernel_print_status
 	
@@ -87,19 +87,17 @@ irq_init_ivt:
 	mov bx, kernel_panic_stackseg
 	call irq_register
 	
-	mov si, .initializing_msg
+	mov si, kernel_msg_initializing_ivt
 	mov al, kernel_status_ok
 	call kernel_print_status
 	
 	popa
 	ret
-	
-	.initializing_msg db "Initializing IVT... ", 0
 
 irq_init_pit:
 	pushad
 	
-	mov si, .initializing_msg
+	mov si, kernel_msg_initializing_pit
 	mov al, kernel_status_waiting
 	call kernel_print_status
  
@@ -198,13 +196,11 @@ irq_init_pit:
     call irq_unmask_pit_line
     pop ax
     
-	mov si, .initializing_msg
+	mov si, kernel_msg_initializing_pit
 	mov al, kernel_status_ok
 	call kernel_print_status
     
     ret
-	
-	.initializing_msg	db "Initializing PIT... ", 0
 	
 ; In: AL - PIT line
 irq_unmask_pit_line:

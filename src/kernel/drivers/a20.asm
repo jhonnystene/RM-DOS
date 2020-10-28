@@ -1,6 +1,6 @@
 a20_enable:
 	pusha
-	mov si, .enabling_msg
+	mov si, kernel_msg_enabling_a20
 	mov al, kernel_status_waiting
 	call kernel_print_status
 	
@@ -38,24 +38,23 @@ a20_enable:
 		jmp .fail
 	
 	.success:
-		mov si, .enabling_msg
+		mov si, kernel_msg_enabling_a20
 		mov al, kernel_status_ok
 		call kernel_print_status
 		popa
 		ret
 	
 	.fail:
-		mov si, .enabling_msg
+		mov si, kernel_msg_enabling_a20
 		mov al, kernel_status_fail
 		call kernel_print_status
 		popa
 		ret
 	
-	.enabling_msg	db "Enabling A20 line... ", 0
 
 a20_enable_keyboardcontroller:
 	pusha
-	mov si, .enabling_msg
+	mov si, kernel_msg_enabling_a20
 	mov al, kernel_status_waiting
 	call kernel_print_status
 	cli
@@ -88,7 +87,7 @@ a20_enable_keyboardcontroller:
 	call .wait
 	
 	sti
-	mov si, .enabling_msg
+	mov si, kernel_msg_enabling_a20
 	mov al, kernel_status_ok
 	call kernel_print_status
 	popa
@@ -106,4 +105,3 @@ a20_enable_keyboardcontroller:
 		jnz .wait2
 		ret
 	
-	.enabling_msg	db "Enabling A20 line... ", 0

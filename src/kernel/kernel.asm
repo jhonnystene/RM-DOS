@@ -74,18 +74,26 @@ kernel_bootstrap:
 	mov gs, ax
 	mov fs, ax
 	mov es, ax
+	
+	call screen_clear
 	jmp kernel_init
 
 kernel_init:
-	call screen_clear
-	
+	; Initialize inturrupts
 	call irq_init_ivt
 	;call irq_init_pit ; This causes issues for some reason so I'm scrapping it for now.
 	
+	; Initialize high memory
 	call a20_enable
-	
 	call screen_print_ram
 	
+	; Print kernel information
+	mov si, kernel_msg_loaded_to_segment
+	call screen_puts
+	mov si, kernel_msg_stack_loaded
+	call screen_puts
+	
+	; Print welcome message and start shell
 	mov si, kernel_msg_welcome
 	call screen_puts
 	

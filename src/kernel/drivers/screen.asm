@@ -250,31 +250,56 @@ screen_repeatchar:
 
 screen_print_ram:
 	pusha
-	clc
-	int 12h
-	jc .error
-	mov si, kernel_msg_low_ram_amount
-	call screen_puts
-	call screen_print_2hex
-	mov si, kernel_msg_kilobytes
-	call screen_puts
-	call screen_newline
 	
-	mov ah, 88h
-	int 15h
-	jc .error
-	
-	mov si, kernel_msg_high_ram_amount
-	call screen_puts
-	call screen_print_2hex
-	mov si, kernel_msg_kilobytes
-	call screen_puts
-	call screen_newline
-	popa
-	ret
-	
-	.error:
-		mov si, kernel_msg_couldnt_get_ram
+	.detect_lomem:
+		clc
+		int 12h
+		jc .lomem_error
+		
+		cmp ax, 0
+		je .lomem_error
+		
+		mov si, kernel_msg_low_ram_amount
 		call screen_puts
+		call screen_print_4hex
+		mov si, kernel_msg_kilobytes
+		call screen_puts
+		call screen_newline
+		jmp .detect_himem
+	
+	.detect_himem:
+		clc
+		mov ah, 88h
+		int 15h
+		jc .himem_error
+		
+		cmp ax, 0
+		je .no_himem
+		
+		mov si, kernel_msg_high_ram_amount
+		call screen_puts
+		call screen_print_4hex
+		mov si, kernel_msg_kilobytes
+		call screen_puts
+		call screen_newline
+		
+		jmp .finish
+	
+	.finish:
 		popa
 		ret
+	
+	.lomem_error:
+		mov si, kernel_msg_couldnt_get_ram
+		call screen_puts
+		jmp .detect_himem
+	
+	.himem_error:
+		mov si, kernel_msg_couldnt_get_ram
+		call screen_puts
+		jmp .finish
+	
+	.no_himem:
+		mov si, kernel_msg_no_himem
+		call screen_puts
+		jmp .finish
