@@ -247,3 +247,34 @@ screen_repeatchar:
 	.done:
 		popa
 		ret
+
+screen_print_ram:
+	pusha
+	clc
+	int 12h
+	jc .error
+	mov si, kernel_msg_low_ram_amount
+	call screen_puts
+	call screen_print_2hex
+	mov si, kernel_msg_kilobytes
+	call screen_puts
+	call screen_newline
+	
+	mov ah, 88h
+	int 15h
+	jc .error
+	
+	mov si, kernel_msg_high_ram_amount
+	call screen_puts
+	call screen_print_2hex
+	mov si, kernel_msg_kilobytes
+	call screen_puts
+	call screen_newline
+	popa
+	ret
+	
+	.error:
+		mov si, kernel_msg_couldnt_get_ram
+		call screen_puts
+		popa
+		ret

@@ -3,6 +3,61 @@ a20_enable:
 	mov si, .enabling_msg
 	mov al, kernel_status_waiting
 	call kernel_print_status
+	
+	mov ax, 2403h
+	int 15h
+	jb .fail
+	cmp ah, 0
+	jnz .fail
+	
+	mov ax, 0x2401
+	int 15h
+	jb  .fail
+	cmp ah, 0
+	jnz .fail
+	
+	jmp .check
+	
+	.fast:
+		in al, 0x92
+		or al, 2
+		out 0x92, al
+		
+		jmp .check
+	
+	.check:
+		mov ax, 0x2402
+		int 15h
+		jb .fail
+		cmp ah, 0
+		jnz .fail
+		
+		cmp al, 1
+		jz .success
+		
+		jmp .fail
+	
+	.success:
+		mov si, .enabling_msg
+		mov al, kernel_status_ok
+		call kernel_print_status
+		popa
+		ret
+	
+	.fail:
+		mov si, .enabling_msg
+		mov al, kernel_status_fail
+		call kernel_print_status
+		popa
+		ret
+	
+	.enabling_msg	db "Enabling A20 line... ", 0
+
+a20_enable_keyboardcontroller:
+	pusha
+	mov si, .enabling_msg
+	mov al, kernel_status_waiting
+	call kernel_print_status
 	cli
 	
 	call .wait
@@ -52,21 +107,3 @@ a20_enable:
 		ret
 	
 	.enabling_msg	db "Enabling A20 line... ", 0
-
-a20_enable_fast:
-	pusha
-	mov si, .enabling_msg
-	mov al, kernel_status_waiting
-	call kernel_print_status
-	
-	in al, 0x92
-	or al, 2
-	out 0x92, al
-	
-	mov si, .enabling_msg
-	mov al, kernel_status_ok
-	call kernel_print_status
-	popa
-	ret
-	
-	.enabling_msg	db "Enabling A20 line (fast method)... ", 0
