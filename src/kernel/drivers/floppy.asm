@@ -61,10 +61,32 @@ floppy_read_sectors:
 		call screen_putchar
 		mov al, 10
 		call screen_putchar
+		
+		mov si, floppy_error_msg2
+		call screen_puts
+		call keyboard_waitkey
+		mov al, 13
+		call screen_putchar
+		mov al, 10
+		call screen_putchar
+		
+		cmp al, 'A'
+		je .error_done
+		cmp al, 'R'
+		je .retry
+		jmp .error
+	
+	.retry:
+		popa
+		pusha
+		jmp floppy_read_sectors
+	
+	.error_done:
 		popa
 		ret
 
-floppy_error_msg	db "[floppy.asm] Floppy error ", 0
+floppy_error_msg	db "Floppy error ", 0
+floppy_error_msg2	db "Abort/Retry? ", 0
 
 floppy_sectors_per_track		dw 18
 floppy_sides					dw 2
