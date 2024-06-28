@@ -91,5 +91,6 @@ kernel_panic_stackseg:
 	jmp kernel_panic_finish
 	
 kernel_panic_finish:
+	call screen_newline
 	call kernel_dump_regs
 	jmp kernel_hang

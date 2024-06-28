@@ -26,7 +26,7 @@ kernel_msg_kilobytes			db " Kilobytes", 0
 
 ; Used in the kernel panic screen
 ; These should be 80 characters long
-kernel_msg_panic				db "                                 Kernel PANIC!!                                 ", 0
+kernel_msg_panic				db "                                 Kernel PANIC!!                                 ", 13, 10, 0
 kernel_msg_halted				db "                                 System halted.                                 ", 13, 10, 0
 kernel_msg_unknown_error		db "                         Unknown error - System halted.                         ", 13, 10, 0
 kernel_msg_divzero_error		db "                         Divide by zero - System halted                         ", 13, 10, 0
@@ -45,6 +45,7 @@ kernel_msg_cx					db "                          CX: ", 0
 kernel_msg_dx					db "DX: ", 0
 kernel_msg_si					db "                          SI: ", 0
 kernel_msg_di					db "DI: ", 0
+kernel_msg_sp					db "SP: ", 0
 kernel_msg_reg_spacer			db "        ", 0
 kernel_msg_hex					db "0x", 0
 
