@@ -85,6 +85,53 @@ floppy_read_sectors:
 		popa
 		ret
 
+; In: AX - Logical Sector Number, BL - Sector Count
+; Out: floppy_buffer - Data
+floppy_write_sectors:
+	call floppy_reset
+	pusha
+	call floppy_get_location
+	mov ah, 03h
+	mov al, bl
+	mov bx, floppy_buffer
+	int 13h
+	jc .error
+	popa
+	ret
+
+	.error:
+		mov si, floppy_error_msg
+		call screen_puts
+		mov al, ah
+		call screen_print_2hex
+		mov al, 13
+		call screen_putchar
+		mov al, 10
+		call screen_putchar
+		
+		mov si, floppy_error_msg2
+		call screen_puts
+		call keyboard_waitkey
+		mov al, 13
+		call screen_putchar
+		mov al, 10
+		call screen_putchar
+		
+		cmp al, 'A'
+		je .error_done
+		cmp al, 'R'
+		je .retry
+		jmp .error
+	
+	.retry:
+		popa
+		pusha
+		jmp floppy_write_sectors
+	
+	.error_done:
+		popa
+		ret
+
 floppy_error_msg	db "Floppy error ", 0
 floppy_error_msg2	db "Abort/Retry? ", 0
 

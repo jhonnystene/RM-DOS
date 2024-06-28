@@ -86,6 +86,33 @@ shell_floppy_dump:
 	call screen_dump_floppy_sector
 	jmp shell_start
 
+; Copy boot sector to other floppy disk
+shell_floppy_bootcpy:
+	pusha
+	mov si, .first_disk_message
+	call screen_puts
+	call keyboard_waitkey
+	
+	mov ax, 0
+	mov bl, 1
+	call floppy_read_sectors
+	
+	mov si, .second_disk_message
+	call screen_puts
+	call keyboard_waitkey
+	
+	mov ax, 0
+	mov bl, 1
+	call floppy_write_sectors
+	
+	popa
+	jmp shell_start
+	
+.first_disk_message db "Insert source disk and strike any key", 13, 10, 0
+.second_disk_message db "Insert target disk and strike any key", 13, 10, 0
+
 command_floppy_dump 		db "FLOPPY DUMP", 0
 command_floppy_read 		db "FLOPPY READ", 0
 command_floppy_explore		db "FLOPPY EXPLORE", 0
+
+command_bootcpy				db "BOOTCPY", 0
