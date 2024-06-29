@@ -3,6 +3,7 @@
 ; Bismuth Kernel
 
 BITS 16
+ORG 2000h
 
 callvectors: ; TODO: Update these
 	; Core kernel functions

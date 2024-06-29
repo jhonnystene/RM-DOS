@@ -9,12 +9,6 @@
 ; # One hash for each loaded block of kernel
 ; . Kernel load complete, jumping to kernel
 
-;	pusha
-;	mov al, ah
-;	call screen_print_2hex
-;	popa
-;	call screen_print_2hex
-
 BITS 16
 
 jmp boot_main
@@ -40,9 +34,6 @@ boot_main:
 	mov es, ax
 	
 	mov [boot_device], dl
-
-	; Setup for string printing
-	stosb
 	
 	call progress
 
@@ -91,7 +82,7 @@ boot_main:
 .kernel_read_loop:
 	; Read next sector of the kernel
 	mov word ax, [.kernel_next_sector]
-	mov bx, [.kernel_target]
+	mov word bx, [.kernel_target]
 	mov cx, 1
 	call read_sectors
 	call progress2
@@ -105,13 +96,13 @@ boot_main:
 	cmp ax, 0FFFFh
 	je .kernel_read_done
 	
-	mov bx, [.kernel_target]
+	mov word bx, [.kernel_target]
 	add bx, 512
-	mov [.kernel_target], bx
+	mov word [.kernel_target], bx
 	jmp .kernel_read_loop
 .kernel_read_done:
 	call progress
-	mov dl, [boot_device] ; Give this to kernel
+	mov dl, byte [boot_device] ; Give this to kernel
 	jmp 2000h:0000h
 	
 .kernel_next_sector dw 0
@@ -135,4 +126,5 @@ disk_buffer:
 times 512 db 0
 times 6 db 0FFh
 
+; Pad out to end of floppy
 times 1474560-($-$$) db 0
