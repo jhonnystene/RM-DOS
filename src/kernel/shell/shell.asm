@@ -46,18 +46,21 @@ shell_get_string:
 		call screen_putchar
 		jmp .loop
 
-prompt db "> ", 0
 string_buffer times 64 db 0
 
 ; INCLUDE MODULES
 %include "src/kernel/shell/shell_floppy.asm"
 %include "src/kernel/shell/shell_screen.asm"
-%include "src/kernel/shell/shell_kernel.asm"
 %include "src/kernel/shell/shell_edit.asm"
 %include "src/kernel/shell/shell_filesystem.asm"
 
 shell_start:
-	mov si, prompt
+	mov si, .flp_text
+	call screen_puts
+	mov al, [floppy_boot_device]
+	add al, '0'
+	call screen_putchar
+	mov si, .prompt
 	call screen_puts
 	mov bx, 0
 	
@@ -69,8 +72,21 @@ shell_start:
 	; INCLUDE MODULES
 	%include "src/kernel/shell/shell_floppy_commands.asm"
 	%include "src/kernel/shell/shell_screen_commands.asm"
-	%include "src/kernel/shell/shell_kernel_commands.asm"
 	%include "src/kernel/shell/shell_edit_commands.asm"
 	%include "src/kernel/shell/shell_filesystem_commands.asm"
+	
+	; KERNEL BUILTINS
+	mov si, systools_bootcpy_command
+	call string_streq
+	jc systools_bootcpy
+	
+	mov si, command_panic
+	call string_streq
+	jc kernel_panic
 		
 	jmp shell_start
+	
+.prompt db "> ", 0
+.flp_text db "flp", 0
+
+command_panic		db "PANIC", 0

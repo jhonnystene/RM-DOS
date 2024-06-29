@@ -38,6 +38,7 @@ callvectors: ; TODO: Update these
 	jmp floppy_check_error				; Check if an error has occurred in the floppy controller.
 	jmp floppy_get_location				; Returns the needed registers for int 13h for a given logical sector.
 	jmp floppy_read_sectors				; Reads any number of sectors into the disk floppy_buffer.
+	jmp floppy_write_sectors			; Writes any number of sectors onto the disk from the floppy_buffer.
 		
 	; FAT12 functions	
 	jmp fat12_get_filename				; Get a filename for a given root directory entry
@@ -112,6 +113,7 @@ kernel_init:
 %include "src/kernel/modules/printregs.asm"
 %include "src/kernel/modules/panic.asm"
 %include "src/kernel/modules/statusmessages.asm" ; TODO: Does this belong in the screen driver?
+%include "src/kernel/modules/systools.asm"
 
 ; DRIVERS
 %include "src/kernel/drivers/floppy.asm"

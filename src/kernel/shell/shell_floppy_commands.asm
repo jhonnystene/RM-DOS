@@ -9,7 +9,3 @@ jc shell_floppy_read
 mov si, command_floppy_explore
 call string_streq
 jc shell_floppy_explore
-
-mov si, command_bootcpy
-call string_streq
-jc shell_floppy_bootcpy
