@@ -3,7 +3,6 @@
 ; Bismuth Kernel
 
 BITS 16
-ORG 2000h
 
 callvectors: ; TODO: Update these
 	; Core kernel functions
@@ -77,7 +76,8 @@ kernel_bootstrap:
 	mov fs, ax
 	mov es, ax
 	
-	call screen_clear
+	mov [floppy_boot_device], dl
+	
 	jmp kernel_init
 
 kernel_init:

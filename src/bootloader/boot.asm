@@ -96,9 +96,7 @@ boot_main:
 	cmp ax, 0FFFFh
 	je .kernel_read_done
 	
-	mov word bx, [.kernel_target]
-	add bx, 512
-	mov word [.kernel_target], bx
+	add word [.kernel_target], 512
 	jmp .kernel_read_loop
 .kernel_read_done:
 	call progress
