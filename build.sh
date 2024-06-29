@@ -1,26 +1,19 @@
 #!/bin/bash
-if test "`whoami`" != "root"; then
-	echo "Please run as root."
-	exit
-fi
+echo "RM-DOS Buildscript v2"
 
-if [ ! -e images/bismuth.flp ]
-then
-	mkdosfs -C images/bismuth.flp 1440 || exit
-fi
+echo "Building bootloader + disk image..."
+chmod +x create-boot-disk.sh
+./create-boot-disk.sh
 
-nasm -O0 -w+orphan-labels -f bin -o src/bootloader/boot.bin src/bootloader/boot.asm || exit
-dd status=noxfer conv=notrunc if=src/bootloader/boot.bin of=images/bismuth.flp || exit
-
+echo "Building kernel..."
 nasm -O0 -w+orphan-labels -f bin -o src/kernel/kernel.bin src/kernel/kernel.asm || exit
 
-rm -rf tmp-loop
-mkdir tmp-loop
-mount -o loop -t vfat images/bismuth.flp tmp-loop
-cp src/kernel/kernel.bin tmp-loop
-sync
-sleep 0.2
-umount tmp-loop || exit
-rm -rf tmp-loop
+echo "Building rmfs-insert..."
+gcc -Wall -o rmfs-insert rmfs-insert.c
+chmod +x rmfs-insert
 
-qemu-system-x86_64 -drive format=raw,if=floppy,file=images/bismuth.flp -monitor stdio #-d in_asm
+echo "Inserting kernel..."
+./rmfs-insert images/disk.img src/kernel/kernel.bin KERNEL.SYS
+
+echo "Running..."
+qemu-system-x86_64 -drive format=raw,if=floppy,file=images/disk.img -monitor stdio #-d in_asm
