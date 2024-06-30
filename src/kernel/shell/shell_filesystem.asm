@@ -1,17 +1,10 @@
 fs_test:
 	mov si, .kernel_filename
-	call fs_file_exists
-	jc .exists
-	mov si, .fail
-	call screen_puts
-	jmp shell_start
-.exists:
-	mov si, .pass
-	call screen_puts
+	call fs_get_first_sector
+	call screen_print_4hex
+	call screen_newline
 	jmp shell_start
 .kernel_filename db "KERNEL.SYS"
-.pass db "PASS", 13, 10, 0
-.fail db "FAIL", 13, 10, 0
 
 ls:
 	call fs_validate_partition
