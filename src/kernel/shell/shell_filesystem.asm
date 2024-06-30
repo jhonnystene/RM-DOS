@@ -1,10 +1,17 @@
 fs_test:
-	mov si, .kernel_filename
-	call fs_get_first_sector
-	call screen_print_4hex
-	call screen_newline
+	mov si, .test_filename
+	call fs_read_file
+	jc .print
+	mov si, .fail_msg
+	call screen_puts
 	jmp shell_start
+.print:
+	mov si, file_buffer
+	call screen_puts
+	jmp shell_start
+.fail_msg db "FAIL", 0
 .kernel_filename db "KERNEL.SYS", 0
+.test_filename db "TEST.FILE", 0
 
 ls:
 	call fs_validate_partition

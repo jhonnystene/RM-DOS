@@ -14,6 +14,7 @@ chmod +x rmfs-insert
 
 echo "Inserting kernel..."
 ./rmfs-insert images/disk.img src/kernel/kernel.bin KERNEL.SYS
+./rmfs-insert images/disk.img src/kernel/kernel.asm TEST.FILE
 
 echo "Running..."
 qemu-system-x86_64 -drive format=raw,if=floppy,file=images/disk.img -monitor stdio #-d in_asm
