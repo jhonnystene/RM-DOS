@@ -4,7 +4,7 @@ fs_test:
 	call screen_print_4hex
 	call screen_newline
 	jmp shell_start
-.kernel_filename db "KERNEL.SYS"
+.kernel_filename db "KERNEL.SYS", 0
 
 ls:
 	call fs_validate_partition
