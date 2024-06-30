@@ -48,9 +48,9 @@ irq_register:
 
 irq_init_ivt:
 	pusha
-	mov si, kernel_msg_initializing_ivt
-	mov al, kernel_status_waiting
-	call kernel_print_status
+	;mov si, kernel_msg_initializing_ivt
+	;mov al, kernel_status_waiting
+	;call kernel_print_status
 	
 	; Divide by zero error
 	mov ax, 0
@@ -87,9 +87,9 @@ irq_init_ivt:
 	mov bx, kernel_panic_stackseg
 	call irq_register
 	
-	mov si, kernel_msg_initializing_ivt
-	mov al, kernel_status_ok
-	call kernel_print_status
+	;mov si, kernel_msg_initializing_ivt
+	;mov al, kernel_status_ok
+	;call kernel_print_status
 	
 	popa
 	ret

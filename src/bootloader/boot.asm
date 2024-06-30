@@ -122,7 +122,7 @@ disk_buffer:
 
 ; Reserve space in allocation table for FS info
 times 512 db 0
-times 6 db 0FFh
+times 16 db 0FFh
 
 ; Pad out to end of floppy
 times 1474560-($-$$) db 0

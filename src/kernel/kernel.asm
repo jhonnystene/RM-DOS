@@ -39,13 +39,6 @@ callvectors: ; TODO: Update these
 	jmp floppy_get_location				; Returns the needed registers for int 13h for a given logical sector.
 	jmp floppy_read_sectors				; Reads any number of sectors into the disk floppy_buffer.
 	jmp floppy_write_sectors			; Writes any number of sectors onto the disk from the floppy_buffer.
-		
-	; FAT12 functions	
-	jmp fat12_get_filename				; Get a filename for a given root directory entry
-	jmp fat12_read_fat					; Read FAT into memory
-	jmp fat12_read_root_directory		; Read root directory into memory
-	jmp fat12_read_root_directory_entry	; Read root directory entry into memory
-	jmp fat12_search_for_file			; Check if file exists
 	
 	; String functions
 	jmp string_streq					; Check if two strings are equal.
@@ -78,6 +71,7 @@ kernel_bootstrap:
 	
 	mov [floppy_boot_device], dl
 	
+	call screen_clear
 	jmp kernel_init
 
 kernel_init:
@@ -87,13 +81,7 @@ kernel_init:
 	
 	; Initialize high memory
 	call a20_enable
-	call screen_print_ram
-	
-	; Print kernel information
-	mov si, kernel_msg_loaded_to_segment
-	call screen_puts
-	mov si, kernel_msg_stack_loaded
-	call screen_puts
+	;call screen_print_ram
 	
 	; Print welcome message and start shell
 	mov si, kernel_msg_welcome
@@ -126,7 +114,7 @@ kernel_init:
 
 ; LIBRARIES
 %include "src/kernel/libraries/string.asm"
-%include "src/kernel/libraries/fat12.asm" ; TODO: This isn't *really* a library, is it?
+%include "src/kernel/libraries/fs.asm" ; TODO: This isn't *really* a library, is it?
 
 ; OTHER
 %include "src/kernel/shell/shell.asm"

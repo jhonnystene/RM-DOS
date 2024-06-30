@@ -76,6 +76,19 @@ screen_putchar:
 	pop bx
 	ret
 
+; I/O: None
+screen_scroll:
+	pusha
+	mov ah, 06h
+	mov al, 1
+	mov bh, 0Fh
+	mov cx, 0
+	mov dh, 25
+	mov dl, 80
+	int 10h
+	popa
+	ret
+
 ; Inputs: AL, BL - Character, color
 screen_putchar_color:
 	pusha
@@ -117,6 +130,8 @@ screen_putchar_color:
 	.newline:
 		mov dl, 0
 		inc dh
+		cmp dh, 25
+		je .scroll
 		jmp .finish
 	
 	; Just go to the start of the line.
@@ -133,6 +148,14 @@ screen_putchar_color:
 		mov bl, 0
 		int 10h
 		inc dh
+		cmp dh, 25
+		je .scroll
+		jmp .finish
+	
+	; Scroll the screen up
+	.scroll:
+		dec dh
+		call screen_scroll
 		jmp .finish
 	
 	; Delete this character.

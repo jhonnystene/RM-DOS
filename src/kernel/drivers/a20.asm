@@ -1,8 +1,8 @@
 a20_enable:
 	pusha
-	mov si, kernel_msg_enabling_a20
-	mov al, kernel_status_waiting
-	call kernel_print_status
+	;mov si, kernel_msg_enabling_a20
+	;mov al, kernel_status_waiting
+	;call kernel_print_status
 	
 	mov ax, 2403h
 	int 15h
@@ -38,16 +38,16 @@ a20_enable:
 		jmp .fail
 	
 	.success:
-		mov si, kernel_msg_enabling_a20
-		mov al, kernel_status_ok
-		call kernel_print_status
-		popa
-		ret
+		;mov si, kernel_msg_enabling_a20
+		;mov al, kernel_status_ok
+		;call kernel_print_status
+		;popa
+		;ret
 	
 	.fail:
-		mov si, kernel_msg_enabling_a20
-		mov al, kernel_status_fail
-		call kernel_print_status
+		;mov si, kernel_msg_enabling_a20
+		;mov al, kernel_status_fail
+		;call kernel_print_status
 		popa
 		ret
 	
