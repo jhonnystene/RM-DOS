@@ -97,6 +97,7 @@ kernel_init:
 %include "src/kernel/modules/systools.asm"
 %include "src/kernel/modules/string.asm"
 %include "src/kernel/modules/fs.asm"
+%include "src/kernel/modules/shell.asm"
 
 ; DRIVERS
 %include "src/kernel/drivers/floppy.asm"
@@ -105,8 +106,5 @@ kernel_init:
 %include "src/kernel/drivers/memory.asm"
 %include "src/kernel/drivers/irq.asm"
 %include "src/kernel/drivers/a20.asm"
-
-; OTHER
-%include "src/kernel/shell/shell.asm"
 
 kernel_msg_copyright			db "RM-DOS Copyright (c) 2024 Johnny Stene. Some Rights Reserved.", 13, 10, 0
