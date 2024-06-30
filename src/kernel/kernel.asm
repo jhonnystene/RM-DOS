@@ -81,10 +81,9 @@ kernel_init:
 	
 	; Initialize high memory
 	call a20_enable
-	;call screen_print_ram
 	
 	; Print welcome message and start shell
-	mov si, kernel_msg_welcome
+	mov si, kernel_msg_copyright
 	call screen_puts
 	
 	call shell_start
@@ -110,6 +109,4 @@ kernel_init:
 ; OTHER
 %include "src/kernel/shell/shell.asm"
 
-kernel_msg_osname	 			db "The Real Mode Disk Operating System (RM-DOS)", 13, 10, 0
-kernel_msg_copyright			db "Copyright (c) 2020 Johnny Stene. Some Rights Reserved.", 13, 10, 0
-kernel_msg_welcome				db "Welcome to RM-DOS!", 13, 10, 0
+kernel_msg_copyright			db "RM-DOS Copyright (c) 2024 Johnny Stene. Some Rights Reserved.", 13, 10, 0
