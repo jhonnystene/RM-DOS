@@ -92,29 +92,24 @@ kernel_init:
 	; We should never get here unless the shell crashed
 	jmp kernel_panic
 
-; LOCALISATION
-; Only one line should be included - the kernel needs to be built with the desired locale
-%include "src/kernel/locales/EN-US.asm"
-
-; TODO: Organize the below better
-
-; KERNEL "MODULES"
+; KERNEL MODULES
 %include "src/kernel/modules/printregs.asm"
 %include "src/kernel/modules/panic.asm"
-%include "src/kernel/modules/statusmessages.asm" ; TODO: Does this belong in the screen driver?
 %include "src/kernel/modules/systools.asm"
+%include "src/kernel/modules/string.asm"
+%include "src/kernel/modules/fs.asm"
 
 ; DRIVERS
 %include "src/kernel/drivers/floppy.asm"
 %include "src/kernel/drivers/screen.asm"
 %include "src/kernel/drivers/keyboard.asm"
 %include "src/kernel/drivers/memory.asm"
-%include "src/kernel/drivers/irq.asm" ; TODO: This isn't *really* a driver, is it?
+%include "src/kernel/drivers/irq.asm"
 %include "src/kernel/drivers/a20.asm"
-
-; LIBRARIES
-%include "src/kernel/libraries/string.asm"
-%include "src/kernel/libraries/fs.asm" ; TODO: This isn't *really* a library, is it?
 
 ; OTHER
 %include "src/kernel/shell/shell.asm"
+
+kernel_msg_osname	 			db "The Real Mode Disk Operating System (RM-DOS)", 13, 10, 0
+kernel_msg_copyright			db "Copyright (c) 2020 Johnny Stene. Some Rights Reserved.", 13, 10, 0
+kernel_msg_welcome				db "Welcome to RM-DOS!", 13, 10, 0

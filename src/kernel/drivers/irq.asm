@@ -96,11 +96,7 @@ irq_init_ivt:
 
 irq_init_pit:
 	pushad
-	
-	mov si, kernel_msg_initializing_pit
-	mov al, kernel_status_waiting
-	call kernel_print_status
- 
+
     ; Do some checking
  
     mov eax,0x10000                   ;eax = reload value for slowest possible frequency (65536)
@@ -195,10 +191,6 @@ irq_init_pit:
     mov al, irq_pit_line_0
     call irq_unmask_pit_line
     pop ax
-    
-	mov si, kernel_msg_initializing_pit
-	mov al, kernel_status_ok
-	call kernel_print_status
     
     ret
 	
