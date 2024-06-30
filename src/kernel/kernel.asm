@@ -77,6 +77,8 @@ kernel_init:
 	call a20_enable
 	
 	; Print welcome message and start shell
+	mov si, kernel_msg_version
+	call screen_puts
 	mov si, kernel_msg_copyright
 	call screen_puts
 	
@@ -101,4 +103,5 @@ kernel_init:
 %include "src/kernel/drivers/irq.asm"
 %include "src/kernel/drivers/a20.asm"
 
-kernel_msg_copyright			db "RM-DOS Copyright (c) 2024 Johnny Stene. Some Rights Reserved.", 13, 10, 0
+kernel_msg_version				db "RM-DOS beta 0.1b", 13, 10, 0
+kernel_msg_copyright			db "Copyright (c) 2024 Johnny Stene. MIT License.", 13, 10, 0

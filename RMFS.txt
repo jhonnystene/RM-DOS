@@ -1,0 +1,21 @@
+RMFS
+========
+
+Boot sector:
+0-15 Bytes: Entry code
+16-29 Bytes: Volume label (null-terminated)
+30-31 Bytes: Magic Number 0xDA31
+32-511 Bytes: Code + BIOS magic
+
+Sector 1:
+File Table:
+[12 bytes] - Filename (any ASCII characters, null-terminated)
+[2 bytes] - First sector (0 for empty)
+[2 bytes] - Reserved
+
+Sector 2-8:
+Allocation Table:
+[2 bytes] - Next sector (FFFF for last, 0000 for unused)
+
+Sector 8+:
+File data

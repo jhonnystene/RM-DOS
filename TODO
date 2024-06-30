@@ -1,5 +1,0 @@
-* Optimize functions to use kernel memory routines
-+ FAT parsing
-+ File loading
-+ Make shell separate file
-+ More string operations (Append, Split, etc...)
