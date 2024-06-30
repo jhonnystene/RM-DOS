@@ -95,7 +95,7 @@ screen_putchar_color:
 	
 	; Carriage return?
 	cmp al, 13
-	je .carriage_return
+	je .skip
 	
 	; Line feed?
 	cmp al, 10
@@ -135,18 +135,11 @@ screen_putchar_color:
 		jmp .finish
 	
 	; Just go to the start of the line.
-	.carriage_return:
-		mov ah, 03h
-		mov bl, 0
-		int 10h
-		mov dl, 0
-		jmp .finish
-	
-	; Go to this same spot, but on the line below.
 	.line_feed:
 		mov ah, 03h
 		mov bl, 0
 		int 10h
+		mov dl, 0
 		inc dh
 		cmp dh, 25
 		je .scroll
@@ -171,6 +164,10 @@ screen_putchar_color:
 		int 10h
 		
 		jmp .finish
+	
+	.skip:
+		popa
+		ret
 	
 screen_newline:
 	pusha
