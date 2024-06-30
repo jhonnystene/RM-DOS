@@ -51,73 +51,52 @@ screen_scroll:
 
 screen_putchar:
 	pusha
-	
-	; Carriage return?
-	cmp al, 13
-	je .skip
-	
-	; Line feed?
-	cmp al, 10
-	je .line_feed
-	
-	; Backspace?
 	cmp al, 8
 	je .backspace
+	cmp al, 9
+	je .tab
 	
-	; Print character
 	mov ah, 0Eh
 	mov bh, 0
 	mov cx, 1
 	int 10h
 	
-	; Get cursor position and increment
+	cmp al, 10
+	je .line_feed
+	popa
+	ret
+
+.backspace:
 	mov ah, 03h
+	mov bl, 0
 	int 10h
-	cmp dl, 80 ; End of line?
-	je .line_feed ; Do a newline
+	dec dl
 	
-	; Set the cursor position to the new position and return
-	.finish:
-		mov ah, 02h
-		mov bh, 0
-		int 10h
-		popa
-		ret
+	mov ah, 0Eh
+	mov al, ' '
+	mov cx, 1
+	int 10h
 	
-	; Just go to the start of the line.
-	.line_feed:
-		mov ah, 03h
-		mov bl, 0
-		int 10h
-		mov dl, 0
-		inc dh
-		cmp dh, 25
-		je .scroll
-		jmp .finish
-	
-	; Scroll the screen up
-	.scroll:
-		dec dh
-		call screen_scroll
-		jmp .finish
-	
-	; Delete this character.
-	.backspace:
-		mov ah, 03h
-		mov bl, 0
-		int 10h
-		dec dl
-		
-		mov ah, 09h
-		mov al, ' '
-		mov cx, 1
-		int 10h
-		
-		jmp .finish
-	
-	.skip:
-		popa
-		ret
+	mov ah, 02h
+	mov bh, 0
+	int 10h
+	popa
+	ret
+
+.line_feed:
+	mov al, 13
+	call screen_putchar
+	popa
+	ret
+
+.tab:
+	mov al, ' '
+	call screen_putchar
+	call screen_putchar
+	call screen_putchar
+	call screen_putchar
+	popa
+	ret
 
 screen_newline:
 	pusha
