@@ -1,6 +1,5 @@
 ; RM-DOS (Real Mode Disk Operating System)
 ; Keep it real
-; Bismuth Kernel
 
 BITS 16
 
@@ -17,8 +16,6 @@ callvectors: ; TODO: Update these
 	jmp kernel_memory_erase				; Erase a chunk of memory
 	
 	; Screen driver functions
-	jmp screen_enter_video_mode			; Switch to video mode
-	jmp screen_enter_text_mode			; Switch to text mode
 	jmp screen_clear					; Empty the screen
 	jmp screen_set_cursor				; Set the cursor position
 	jmp screen_puts						; Print a string to the screen.
@@ -26,9 +23,6 @@ callvectors: ; TODO: Update these
 	jmp screen_newline					; Print a newline + carriage return.
 	jmp screen_print_2hex				; Print an 8-bit value to screen.
 	jmp screen_print_4hex				; Print a 16-bit value to screen.
-	jmp screen_repeatchar				; Print a character repeatedly.
-	jmp screen_dump_floppy_sector		; Dump floppy sector to screen.
-	jmp screen_repeatchar				; Repeat a character on screen.
 	
 	; Keyboard driver functions	
 	jmp keyboard_waitkey 				; Wait for a key to be pressed, and return that key.

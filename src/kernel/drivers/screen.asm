@@ -1,19 +1,3 @@
-screen_enter_video_mode:
-	pusha
-	mov ah, 00h
-	mov al, 13h
-	int 10h
-	popa
-	ret
-
-screen_enter_text_mode:
-	pusha
-	mov ah, 00h
-	mov al, 03h
-	int 10h
-	popa
-	ret
-
 screen_clear:
 	pusha
 	mov ah, 06h
@@ -52,36 +36,12 @@ screen_puts:
 		popa
 		ret
 
-; Inputs: SI, BL - String, Color
-screen_color_puts:
-	pusha
-	.loop:
-		lodsb
-		cmp al, 0
-		je .done
-		
-		call screen_putchar_color
-		
-		jmp .loop
-	
-	.done:
-		popa
-		ret
-
-; Inputs: AL - Character
-screen_putchar:
-	push bx
-	mov bl, 0Fh
-	call screen_putchar_color
-	pop bx
-	ret
-
 ; I/O: None
 screen_scroll:
 	pusha
 	mov ah, 06h
 	mov al, 1
-	mov bh, 0Fh
+	mov bh, 07h
 	mov cx, 0
 	mov dh, 25
 	mov dl, 80
@@ -89,8 +49,7 @@ screen_scroll:
 	popa
 	ret
 
-; Inputs: AL, BL - Character, color
-screen_putchar_color:
+screen_putchar:
 	pusha
 	
 	; Carriage return?
@@ -106,7 +65,7 @@ screen_putchar_color:
 	je .backspace
 	
 	; Print character
-	mov ah, 09h
+	mov ah, 0Eh
 	mov bh, 0
 	mov cx, 1
 	int 10h
@@ -114,9 +73,8 @@ screen_putchar_color:
 	; Get cursor position and increment
 	mov ah, 03h
 	int 10h
-	inc dl
 	cmp dl, 80 ; End of line?
-	je .newline ; Do a newline
+	je .line_feed ; Do a newline
 	
 	; Set the cursor position to the new position and return
 	.finish:
@@ -125,14 +83,6 @@ screen_putchar_color:
 		int 10h
 		popa
 		ret
-	
-	; Line feed + carriage return.
-	.newline:
-		mov dl, 0
-		inc dh
-		cmp dh, 25
-		je .scroll
-		jmp .finish
 	
 	; Just go to the start of the line.
 	.line_feed:
@@ -168,7 +118,7 @@ screen_putchar_color:
 	.skip:
 		popa
 		ret
-	
+
 screen_newline:
 	pusha
 	mov ah, 0Eh
@@ -216,44 +166,6 @@ screen_print_4hex:
 	popa
 	ret
 	
-screen_dump_floppy_sector:
-	pusha
-	mov bx, 0
-	mov cx, 0
-	call .spaces
-	
-	.loop:
-		mov al, [floppy_buffer + bx]
-		call screen_print_2hex
-		;mov al, ' '
-		;call screen_putchar
-		inc bx
-		inc cx
-		cmp bx, 512
-		je .done
-		cmp cx, 32
-		je .newline
-		jmp .loop
-	
-	.spaces:
-		push ax
-		mov al, ' '
-		mov ah, 8
-		call screen_repeatchar
-		pop ax
-		ret
-	
-	.newline:
-		call screen_newline
-		mov cx, 0
-		call .spaces
-		jmp .loop
-		
-	.done:
-		call screen_newline
-		popa
-		ret
-		
 ; In: AH, AL: Count, Char
 screen_repeatchar:
 	pusha
