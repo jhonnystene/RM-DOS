@@ -1,0 +1,39 @@
+RM-DOS Build Instructions
+===========
+
+1. Requirements
+	You must have the following installed:
+	- GCC
+	- NASM
+	- qemu-system-x86_64 (if you plan to test in a VM)
+2. Build script
+	RM-DOS has a simple build script (build.sh). Each line + its' explaination is below.
+	
+	Set up build folder and welcome user
+		echo "RM-DOS Buildscript v2"
+		mkdir build
+	
+	Create RMFS disk image
+		echo "Building bootloader + disk image..."
+		nasm -O0 -w+orphan-labels -f bin -o build/disk.img src/bootloader/boot.asm
+
+	Build KERNEL.SYS, the heart of RM-DOS
+		echo "Building kernel..."
+		nasm -O0 -w+orphan-labels -f bin -o build/kernel.sys src/kernel/kernel.asm || exit
+
+	Build rmfs-insert, a tool to insert files into the disk image
+		echo "Building rmfs-insert..."
+		gcc -Wall -o build/rmfs-insert tools/rmfs-insert.c || exit
+
+	Make rmfs-insert executable
+		chmod +x build/rmfs-insert
+
+	Insert KERNEL.SYS and TEST.FILE (a tiny test file to sanity check filesystem commands)
+		echo "Inserting kernel..."
+		./build/rmfs-insert build/disk.img build/kernel.sys KERNEL.SYS || exit
+		./build/rmfs-insert build/disk.img tools/test.file TEST.FILE || exit
+
+	Start a virtual machine with the disk image set as the main floppy.
+	You can uncomment "-d in_asm" if you want to view every instruction as it executes (useful for debugging)
+		echo "Running..."
+		qemu-system-x86_64 -drive format=raw,if=floppy,file=build/disk.img -monitor stdio #-d in_asm

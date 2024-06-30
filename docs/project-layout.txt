@@ -1,0 +1,12 @@
+RM-DOS
+	build/ - Created locally when building RM-DOS. Includes the RM-DOS disk image, built kernel, and other assorted files.
+	docs/ - Documentation about RM-DOS and its components
+	src/ - Source code
+		bootloader/ - RM-DOS Bootloader
+		kernel/ - RM-DOS Kernel and built-in software
+			drivers/ - Code for interfacing with hardware
+			modules/ - Core kernel functionality
+			programs/ - User-facing programs
+	tools/ - Assorted utility programs and functions.
+	build.sh - Buildscript
+	LICENSE - The agreement between me and you for what you get to do with RM-DOS
