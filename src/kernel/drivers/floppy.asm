@@ -139,3 +139,4 @@ floppy_sectors_per_track		dw 18
 floppy_sides					dw 2
 floppy_boot_device				db 0
 floppy_buffer					equ 24576
+file_buffer						equ 32768
