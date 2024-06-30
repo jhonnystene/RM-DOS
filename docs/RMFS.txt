@@ -1,21 +1,32 @@
-RMFS
-========
+RMFS File System Documentation
+===========
 
-Boot sector:
-0-15 Bytes: Entry code
-16-29 Bytes: Volume label (null-terminated)
-30-31 Bytes: Magic Number 0xDA31
-32-511 Bytes: Code + BIOS magic
+Why another filesystem?
+	Because implementing other file systems was too much work.
 
-Sector 1:
-File Table:
-[12 bytes] - Filename (any ASCII characters, null-terminated)
-[2 bytes] - First sector (0 for empty)
-[2 bytes] - Reserved
+Notes:
+	- The implementation of RMFS in RM-DOS does not do sanity checking, it assumes everything is reasonable
+	- Sectors should be called "blocks" when being shown to the end-user
 
-Sector 2-8:
-Allocation Table:
-[2 bytes] - Next sector (FFFF for last, 0000 for unused)
+Disk Layout:
+	Boot sector:
+		0-15 Bytes: Entry code
+		16-29 Bytes: Volume label (null-terminated)
+		30-31 Bytes: Magic Number 0xDA31
+		32-511 Bytes: Code + BIOS magic
 
-Sector 8+:
-File data
+	Sector 1:
+		File Table:
+			[12 bytes] - Filename (any ASCII characters, null-terminated)
+			[2 bytes] - First sector (0 for empty)
+			[2 bytes] - Reserved
+		There is room for 32 files in the file table.
+
+	Sector 2-8:
+		Allocation Table:
+			[2 bytes] - Next sector (FFFF for last, 0000 for unused)
+		The allocation table can be as large as 128 sectors to account for disks as big as 32 MiB in size, 
+		however RM-DOS currently doesn't have support for this due to the 64 KiB address space available to the kernel.
+
+	Sector 8+:
+		File data
