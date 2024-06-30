@@ -1,20 +1,21 @@
 #!/bin/bash
 echo "RM-DOS Buildscript v2"
 
+mkdir build
+
 echo "Building bootloader + disk image..."
-chmod +x create-boot-disk.sh
-./create-boot-disk.sh
+nasm -O0 -w+orphan-labels -f bin -o build/disk.img src/bootloader/boot.asm
 
 echo "Building kernel..."
-nasm -O0 -w+orphan-labels -f bin -o src/kernel/kernel.bin src/kernel/kernel.asm || exit
+nasm -O0 -w+orphan-labels -f bin -o build/kernel.sys src/kernel/kernel.asm || exit
 
 echo "Building rmfs-insert..."
-gcc -Wall -o rmfs-insert rmfs-insert.c || exit
-chmod +x rmfs-insert
+gcc -Wall -o build/rmfs-insert tools/rmfs-insert.c || exit
+chmod +x build/rmfs-insert
 
 echo "Inserting kernel..."
-./rmfs-insert images/disk.img src/kernel/kernel.bin KERNEL.SYS || exit
-./rmfs-insert images/disk.img test.file TEST.FILE || exit
+./build/rmfs-insert build/disk.img build/kernel.sys KERNEL.SYS || exit
+./build/rmfs-insert build/disk.img tools/test.file TEST.FILE || exit
 
 echo "Running..."
-qemu-system-x86_64 -drive format=raw,if=floppy,file=images/disk.img -monitor stdio #-d in_asm
+qemu-system-x86_64 -drive format=raw,if=floppy,file=build/disk.img -monitor stdio #-d in_asm
