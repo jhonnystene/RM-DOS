@@ -3,10 +3,11 @@
 
 BITS 16
 
-callvectors: ; TODO: Update these
+; OS Call Vectors
+; These are parsed by gen-api.py to create API include file and documentation
+callvectors:
 	; Core kernel functions
-	jmp kernel_bootstrap				; Setup stack and segmenting, then call kernel_init.
-	jmp kernel_init						; Do any needed init functions, then start the shell.
+	jmp kernel_bootstrap				; Setup stack and segmenting, then call kernel_init. Effectively a warm reboot.
 	jmp kernel_hang						; Freeze the kernel
 	jmp kernel_panic					; Dump registers and hang.
 	jmp kernel_dump_regs				; Dump CPU registers to screen.
@@ -17,37 +18,34 @@ callvectors: ; TODO: Update these
 	
 	; Screen driver functions
 	jmp screen_clear					; Empty the screen
-	jmp screen_set_cursor				; Set the cursor position
-	jmp screen_puts						; Print a string to the screen.
-	jmp screen_putchar					; Print a single character to the screen.
+	jmp screen_set_cursor				; Set the cursor position (dh/dl)
+	jmp screen_puts						; Print a string (si) to the screen.
+	jmp screen_putchar					; Print a single character (al) to the screen.
 	jmp screen_newline					; Print a newline + carriage return.
-	jmp screen_print_2hex				; Print an 8-bit value to screen.
-	jmp screen_print_4hex				; Print a 16-bit value to screen.
+	jmp screen_print_2hex				; Print an 8-bit value (al) to screen.
+	jmp screen_print_4hex				; Print a 16-bit value (ax) to screen.
 	
 	; Keyboard driver functions	
-	jmp keyboard_waitkey 				; Wait for a key to be pressed, and return that key.
+	jmp keyboard_waitkey 				; Wait for a key to be pressed, and return that key (ax).
 	
 	; Floppy driver functions
 	jmp floppy_reset 					; Reset the floppy controller.
-	jmp floppy_check_error				; Check if an error has occurred in the floppy controller.
-	jmp floppy_get_location				; Returns the needed registers for int 13h for a given logical sector.
-	jmp floppy_read_sectors				; Reads any number of sectors into the disk floppy_buffer.
-	jmp floppy_write_sectors			; Writes any number of sectors onto the disk from the floppy_buffer.
+	jmp floppy_read_sectors				; Reads any number (bl) of sectors (starting at ax) into the disk floppy_buffer.
+	jmp floppy_write_sectors			; Writes any number (bl) of sectors (starting at ax) onto the disk from the floppy_buffer.
 	
 	; String functions
-	jmp string_streq					; Check if two strings are equal.
-	jmp string_strlen					; Check the length of a string.
-	jmp string_char_upper				; Return the uppercase version of a character.
-	jmp string_to_int					; Convert a string to an integer.
+	jmp string_streq					; Check (cf) if two strings (si, di) are equal.
+	jmp string_strlen					; Check the length (ax) of a string (si).
+	jmp string_char_upper				; Return the uppercase version (al) of a character (al).
+	jmp string_to_int					; Convert a string (si) to an integer (ax).
 	
-	; Shell functions
-	jmp shell_get_string				; Get a string as input.
-	jmp shell_start						; Initialize the shell.
-	
-	; IRQ and PIT functions
-	jmp irq_IRQ0_handler
-	jmp irq_init_pit
-	jmp irq_init_ivt
+	; FS functions
+	jmp fs_validate_partition			; Validate (cf) that the inserted disk has a valid filesystem
+	jmp fs_file_exists					; Validate (cf) that the file (si) exists
+	jmp fs_read_file					; Read file (si) from disk (to 8000h - edit ES before doing this as this is where your app loads!)
+
+kernel_msg_version				db "RM-DOS beta 0.2b", 13, 10, 0
+kernel_msg_copyright			db "Copyright (c) 2024 Johnny Stene. MIT License.", 13, 10, 0 
 
 ; Setup stack and segmenting and boot OS
 kernel_bootstrap:
@@ -102,6 +100,3 @@ kernel_init:
 %include "src/kernel/drivers/memory.asm"
 %include "src/kernel/drivers/irq.asm"
 %include "src/kernel/drivers/a20.asm"
-
-kernel_msg_version				db "RM-DOS beta 0.1b", 13, 10, 0
-kernel_msg_copyright			db "Copyright (c) 2024 Johnny Stene. MIT License.", 13, 10, 0

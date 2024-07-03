@@ -1,6 +1,8 @@
 RM-DOS
 	build/ - Created locally when building RM-DOS. Includes the RM-DOS disk image, built kernel, and other assorted files.
 	docs/ - Documentation about RM-DOS and its components
+	sdk/ - Tools for building RM-DOS applications
+		docs/ - RM-DOS Application Development Guide
 	src/ - Source code
 		bootloader/ - RM-DOS Bootloader
 		kernel/ - RM-DOS Kernel and built-in software

@@ -14,5 +14,3 @@ a better choice all around, I am not yet an x86 assembly God so I will take what
 - Finish FS driver, with functions to create, rename, delete, and edit files
 - Create program to switch drives
 - Text editor
-- Have shell load and run applications from disk
-- Have a toolkit for creating said applications

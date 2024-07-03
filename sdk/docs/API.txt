@@ -1,0 +1,105 @@
+RM-DOS API Functions
+=== FUNCTION ===
+NAME: kernel_bootstrap
+DESCRIPTION: Setup stack and segmenting, then call kernel_init. Effectively a warm reboot.
+
+=== FUNCTION ===
+NAME: kernel_hang
+DESCRIPTION: Freeze the kernel
+
+=== FUNCTION ===
+NAME: kernel_panic
+DESCRIPTION: Dump registers and hang.
+
+=== FUNCTION ===
+NAME: kernel_dump_regs
+DESCRIPTION: Dump CPU registers to screen.
+
+=== FUNCTION ===
+NAME: kernel_memory_copy
+DESCRIPTION: Copy memory from one location to another
+
+=== FUNCTION ===
+NAME: kernel_memory_erase
+DESCRIPTION: Erase a chunk of memory
+
+=== FUNCTION ===
+NAME: screen_clear
+DESCRIPTION: Empty the screen
+
+=== FUNCTION ===
+NAME: screen_set_cursor
+DESCRIPTION: Set the cursor position (dh/dl)
+
+=== FUNCTION ===
+NAME: screen_puts
+DESCRIPTION: Print a string (si) to the screen.
+
+=== FUNCTION ===
+NAME: screen_putchar
+DESCRIPTION: Print a single character (al) to the screen.
+
+=== FUNCTION ===
+NAME: screen_newline
+DESCRIPTION: Print a newline + carriage return.
+
+=== FUNCTION ===
+NAME: screen_print_2hex
+DESCRIPTION: Print an 8-bit value (al) to screen.
+
+=== FUNCTION ===
+NAME: screen_print_4hex
+DESCRIPTION: Print a 16-bit value (ax) to screen.
+
+=== FUNCTION ===
+NAME: keyboard_waitkey 
+DESCRIPTION: Wait for a key to be pressed, and return that key (ax).
+
+=== FUNCTION ===
+NAME: floppy_reset 
+DESCRIPTION: Reset the floppy controller.
+
+=== FUNCTION ===
+NAME: floppy_read_sectors
+DESCRIPTION: Reads any number (bl) of sectors (starting at ax) into the disk floppy_buffer.
+
+=== FUNCTION ===
+NAME: floppy_write_sectors
+DESCRIPTION: Writes any number (bl) of sectors (starting at ax) onto the disk from the floppy_buffer.
+
+=== FUNCTION ===
+NAME: string_streq
+DESCRIPTION: Check (cf) if two strings (si, di) are equal.
+
+=== FUNCTION ===
+NAME: string_strlen
+DESCRIPTION: Check the length (ax) of a string (si).
+
+=== FUNCTION ===
+NAME: string_char_upper
+DESCRIPTION: Return the uppercase version (al) of a character (al).
+
+=== FUNCTION ===
+NAME: string_to_int
+DESCRIPTION: Convert a string (si) to an integer (ax).
+
+=== FUNCTION ===
+NAME: fs_validate_partition
+DESCRIPTION: Validate (cf) that the inserted disk has a valid filesystem
+
+=== FUNCTION ===
+NAME: fs_file_exists
+DESCRIPTION: Validate (cf) that the file (si) exists
+
+=== FUNCTION ===
+NAME: fs_read_file
+DESCRIPTION: Read file (si) from disk (to 8000h - edit ES before doing this as this is where your app loads!)
+
+=== KERNEL MESSAGE ===
+NAME: kernel_msg_version
+TEXT: "RM-DOS beta 0.1b"
+
+=== KERNEL MESSAGE ===
+NAME: kernel_msg_copyright
+TEXT: "Copyright (c) 2024 Johnny Stene. MIT License."
+

@@ -84,10 +84,7 @@ shell_start:
 .process: ; Process command
 	mov di, shell_command
 	
-	; ABOUT
-	mov si, command_about
-	call string_streq
-	jc program_about
+	; Builtin commands
 	; CLS
 	mov si, command_cls
 	call string_streq
@@ -109,14 +106,31 @@ shell_start:
 	call string_streq
 	jc program_type
 	
+	mov si, shell_command
+	call fs_file_exists
+	jc .load_binary
+	
 	mov si, .invalid_command
 	call screen_puts
 	
+	jmp shell_start
+.load_binary:
+	call fs_read_file
+	jc .load_success
+	mov si, .load_failure
+	call screen_puts
+	jmp shell_start
+.load_success:
+	mov si, [shell_argument]
+	pusha
+	call 8000h ; Jump to loaded file
+	popa
 	jmp shell_start
 	
 .prompt db "> ", 0
 .flp_text db "flp", 0
 .invalid_command db "Invalid command. Enter HELP for help.", 13, 10, 0
+.load_failure db "Failed to load application file.", 13, 10, 0
 shell_command times 16 db 0
 shell_argument dw 0
 shell_buffer times 64 db 0
@@ -124,7 +138,6 @@ shell_buffer times 64 db 0
 command_panic		db "PANIC", 0
 
 ; INCLUDE MODULES
-%include "src/kernel/programs/about.asm"
 %include "src/kernel/programs/cls.asm"
 %include "src/kernel/programs/dir.asm"
 %include "src/kernel/programs/disk.asm"

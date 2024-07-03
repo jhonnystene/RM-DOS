@@ -19,7 +19,7 @@ program_help:
 	jmp shell_start
 .help1 db "RM-DOS Help", 13, 10, 0
 .help2 db "=============", 13, 10, 0
-.help3 db "ABOUT - Displays information about RM-DOS", 13, 10, 0
+.help3 db "", 13, 10, 0
 .help4 db "CLS - Clears the screen", 13, 10, 0
 .help5 db "DIR - Lists files on the disk", 13, 10, 0
 .help6 db "DISK - Floppy disk utilities", 13, 10, 0

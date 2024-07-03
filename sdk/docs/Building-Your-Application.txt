@@ -1,0 +1,16 @@
+Building RM-DOS Applications
+==================
+
+1. Ensure you have the latest RMDOS.asm file
+	This can be found in the sdk/ folder in the RM-DOS project. It is regenerated with every run of build.sh.
+2. Structure your application correctly
+	For the API file to work as intended, your %include directive MUST be at the top of the file (comments, of course, can go above it)
+	See sdk/example-about.asm for an example.
+3. Build the application
+	The recommended NASM command for this is as follows:
+	nasm -O0 -w+orphan-labels -f bin -o [output location] [filename]
+4. Insert the application into an RM-DOS disk image using rmfs-insert:
+	This assumes you already have rmfs-insert from a successful build. If not, rmfs-insert can be built with:
+		gcc -Wall -o rmfs-insert tools/rmfs-insert.c
+	Insert the file with the following command:
+	./rmfs-insert [disk image path] [outputted binary path] [desired filename on disk, all caps]
