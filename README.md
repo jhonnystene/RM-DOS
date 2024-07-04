@@ -12,5 +12,4 @@ a better choice all around, I am not yet an x86 assembly God so I will take what
 
 ## Short-term TODO?
 - Finish FS driver, with functions to create, rename, delete, and edit files
-- Create program to switch drives
 - Text editor

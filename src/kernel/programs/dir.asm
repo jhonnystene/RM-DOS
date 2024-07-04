@@ -3,8 +3,7 @@ program_dir:
 	jc .good
 	mov si, fs_invalid_message
 	call screen_puts
-	popa
-	ret
+	jmp shell_start
 .good:
 	call fs_load_file_table
 	mov bx, floppy_buffer

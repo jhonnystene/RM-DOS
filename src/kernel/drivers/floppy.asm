@@ -53,35 +53,16 @@ floppy_read_sectors:
 	ret
 
 	.error:
-		mov si, floppy_error_msg
-		call screen_puts
-		mov al, ah
-		call screen_print_2hex
-		mov al, 13
-		call screen_putchar
-		mov al, 10
-		call screen_putchar
+		call floppy_error
+		jc .retry
+		jmp .fail
 		
-		mov si, floppy_error_msg2
-		call screen_puts
-		call keyboard_waitkey
-		mov al, 13
-		call screen_putchar
-		mov al, 10
-		call screen_putchar
-		
-		cmp al, 'A'
-		je .error_done
-		cmp al, 'R'
-		je .retry
-		jmp .error
-	
 	.retry:
 		popa
 		pusha
 		jmp floppy_read_sectors
 	
-	.error_done:
+	.fail:
 		popa
 		ret
 
@@ -93,42 +74,22 @@ floppy_read_sector_to:
 	call floppy_get_location
 	mov ah, 02h
 	mov al, 1
-	;jmp kernel_panic
 	int 13h
 	jc .error
 	popa
 	ret
 
 	.error:
-		mov si, floppy_error_msg
-		call screen_puts
-		mov al, ah
-		call screen_print_2hex
-		mov al, 13
-		call screen_putchar
-		mov al, 10
-		call screen_putchar
+		call floppy_error
+		jc .retry
+		jmp .fail
 		
-		mov si, floppy_error_msg2
-		call screen_puts
-		call keyboard_waitkey
-		mov al, 13
-		call screen_putchar
-		mov al, 10
-		call screen_putchar
-		
-		cmp al, 'A'
-		je .error_done
-		cmp al, 'R'
-		je .retry
-		jmp .error
-	
 	.retry:
 		popa
 		pusha
 		jmp floppy_read_sector_to
 	
-	.error_done:
+	.fail:
 		popa
 		ret
 
@@ -147,40 +108,54 @@ floppy_write_sectors:
 	ret
 
 	.error:
-		mov si, floppy_error_msg
-		call screen_puts
-		mov al, ah
-		call screen_print_2hex
-		mov al, 13
-		call screen_putchar
-		mov al, 10
-		call screen_putchar
-		
-		mov si, floppy_error_msg2
-		call screen_puts
-		call keyboard_waitkey
-		mov al, 13
-		call screen_putchar
-		mov al, 10
-		call screen_putchar
-		
-		cmp al, 'A'
-		je .error_done
-		cmp al, 'R'
-		je .retry
-		jmp .error
+		call floppy_error
+		jc .retry
+		jmp .fail
 	
 	.retry:
 		popa
 		pusha
 		jmp floppy_write_sectors
 	
-	.error_done:
+	.fail:
 		popa
 		ret
 
+; Out: Carry - set if retry, clear if fail
+floppy_error:
+	pusha
+	mov si, floppy_error_msg
+	call screen_puts
+	mov al, ah
+	call screen_print_2hex
+	call screen_newline
+	
+	mov si, floppy_error_msg2
+	call screen_puts
+	call keyboard_waitkey
+	call string_char_upper
+	call screen_putchar
+	call screen_newline
+	
+	cmp al, 'A'
+	je kernel_bootstrap
+	cmp al, 'F'
+	je .fail
+	cmp al, 'R'
+	je .retry
+	popa
+	jmp floppy_error
+.fail:
+	popa
+	clc
+	ret
+.retry:
+	popa
+	stc
+	ret
+
 floppy_error_msg	db "Floppy error ", 0
-floppy_error_msg2	db "Abort/Retry? ", 0
+floppy_error_msg2	db "Abort/Retry/Fail? ", 0
 
 floppy_sectors_per_track		dw 18
 floppy_sides					dw 2
