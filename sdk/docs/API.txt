@@ -97,7 +97,7 @@ DESCRIPTION: Read file (si) from disk (to 8000h - edit ES before doing this as t
 
 === KERNEL MESSAGE ===
 NAME: kernel_msg_version
-TEXT: "RM-DOS beta 0.1b"
+TEXT: "RM-DOS beta 0.2b"
 
 === KERNEL MESSAGE ===
 NAME: kernel_msg_copyright

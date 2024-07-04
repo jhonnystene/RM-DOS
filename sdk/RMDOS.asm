@@ -25,5 +25,5 @@ string_to_int equ 003Ch
 fs_validate_partition equ 003Fh
 fs_file_exists equ 0042h
 fs_read_file equ 0045h
-kernel_msg_version				db "RM-DOS beta 0.1b", 13, 10, 0
+kernel_msg_version				db "RM-DOS beta 0.2b", 13, 10, 0
 kernel_msg_copyright			db "Copyright (c) 2024 Johnny Stene. MIT License.", 13, 10, 0

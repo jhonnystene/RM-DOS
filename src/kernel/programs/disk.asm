@@ -5,12 +5,17 @@ program_disk:
 	call string_streq
 	jc program_disk_explore
 	
+	mov di, .switch
+	call string_streq
+	jc program_disk_switch
+	
 	mov si, .usage
 	call screen_puts
 	
 	jmp shell_start
 .explore db "EXPLORE", 0
-.usage db "Usage: DISK [EXPLORE]", 13, 10, 0
+.switch db "SWITCH", 0
+.usage db "Usage: DISK [EXPLORE, SWITCH]", 13, 10, 0
 
 ; Let user explore around the floppy
 program_disk_explore:
@@ -102,5 +107,24 @@ program_disk_explore_dump_sector:
 		call screen_newline
 		popa
 		ret
+
+; Switch floppies
+program_disk_switch:
+	mov si, .enter_floppy_text
+	call screen_puts
+	call keyboard_waitkey
+	call screen_newline
+	cmp al, '0'
+	je .zero
+	cmp al, '1'
+	je .one
+	jmp program_disk_switch
+.zero:
+	mov byte [floppy_boot_device], 0
+	jmp shell_start
+.one:
+	mov byte [floppy_boot_device], 1
+	jmp shell_start
+.enter_floppy_text db "Enter floppy disk chosen (0/1): ", 0
 
 command_disk db "DISK", 0
